@@ -1,0 +1,48 @@
+PARSER_BEGIN(MyParser)
+public class MyParser {
+    // Parser code goes here
+}
+PARSER_END(MyParser)
+
+SKIP : { " " | "\n" | "\r" | "\r\n" }
+
+TOKEN:
+{
+  < ID: "^[A-Za-z]+$" >
+| < INT_CONST: "[0-9]+" >
+| < FLOAT_CONST: "[0-9]*\\.[0-9]+" >
+| < STRING_CONST: "\"[^\"]*\"" >
+| < INT: "int" >
+| < FLOAT: "float" >
+| < STRING: "string" >
+| < DEF: "def" >
+| < BREAK: "break" >
+| < PRINT: "print" >
+| < READ: "read" >
+| < RETURN: "return" >
+| < NEW: "new" >
+| < NULL: "null" >
+| < IF: "if" >
+| < ELSE: "else" >
+| < FOR: "for" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < MULT: "*" >
+| < DIV: "/" >
+| < OPENP: "(" >
+| < CLOSEP: ")" >
+| < OPENCB: "{" >
+| < CLOSECB: "}" >
+| < OPENB: "[" >
+| < CLOSEB: "]" >
+| < SEMIC: ";" >
+| < COMMA: "," >
+| < EQUALS: "==" >
+| < ASSIGN: "=" >
+| < GREAT: ">" >
+| < LESS: "<" >
+| < GREATEQ: ">=" >
+| < LESSEQ: "<=" >
+| < DIFF: "!=" >
+| < MOD: "%" >
+}
