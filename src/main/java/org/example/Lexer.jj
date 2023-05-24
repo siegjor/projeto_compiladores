@@ -1,8 +1,10 @@
-PARSER_BEGIN(MyParser)
-public class MyParser {
-    // Parser code goes here
+PARSER BEGIN(MyParser)
+class MyParser {
+  static void main( String[] args ) throws ParseException, TokenMgrError {
+    MyParser parser = new Adder( System.in ) ;
+    parser.Start() ; }
 }
-PARSER_END(MyParser)
+PARSER END(MyParser)
 
 SKIP : { " " | "\n" | "\r" | "\r\n" }
 
@@ -18,7 +20,7 @@ TOKEN:
 | < DEF: "def" >
 | < BREAK: "break" >
 | < PRINT: "print" >
-| < READ: "read" >
+|' < READ: "read" >
 | < RETURN: "return" >
 | < NEW: "new" >
 | < NULL: "null" >
@@ -45,4 +47,17 @@ TOKEN:
 | < LESSEQ: "<=" >
 | < DIFF: "!=" >
 | < MOD: "%" >
+}
+
+void Start() :
+{Token t;}
+{
+  <DEF> {System.out.println("Palavra reservada: def");}
+  (
+    <OPENB> {System.out.println("Palavra reservada: (";}
+    <CLOSEB> {System.out.println("Palavra reservada: )");}
+    <OPENCB> {System.out.println("Palavra reservada: {");}
+    <CLOSECB> {System.out.println("Palavra reservada: }");}
+  )*
+  <EOF>
 }
