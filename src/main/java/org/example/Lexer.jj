@@ -1,7 +1,7 @@
 PARSER_BEGIN(MyParser)
 class MyParser {
   public static void main( String[] args ) throws ParseException, TokenMgrError {
-    MyParser parser = new Adder( System.in ) ;
+    MyParser parser = new MyParser( System.in ) ;
     parser.Start() ;
     }
 }
