@@ -3,10 +3,6 @@ class MyParser {
   public static void main( String[] args ) throws ParseException, TokenMgrError {
     MyParser parser = new MyParser( System.in ) ;
     parser.Start() ;
-    // javacc Lexer.jj
-    // javac *.java
-    // java MyParser < ex.txt
-    //^[A-Za-z]+$
     }
 }
 PARSER_END(MyParser)
