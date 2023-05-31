@@ -75,13 +75,17 @@ public interface MyParserConstants {
   /** RegularExpression Id. */
   int MOD = 37;
   /** RegularExpression Id. */
-  int ID = 38;
+  int LETTER = 38;
   /** RegularExpression Id. */
-  int STRING_CONST = 39;
+  int DIGIT = 39;
   /** RegularExpression Id. */
-  int FLOAT_CONST = 40;
+  int ID = 40;
   /** RegularExpression Id. */
   int INT_CONST = 41;
+  /** RegularExpression Id. */
+  int FLOAT_CONST = 42;
+  /** RegularExpression Id. */
+  int STRING_CONST = 43;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -126,10 +130,12 @@ public interface MyParserConstants {
     "\"<=\"",
     "\"!=\"",
     "\"%\"",
+    "<LETTER>",
+    "<DIGIT>",
     "<ID>",
-    "<STRING_CONST>",
-    "<FLOAT_CONST>",
     "<INT_CONST>",
+    "<FLOAT_CONST>",
+    "<STRING_CONST>",
   };
 
 }

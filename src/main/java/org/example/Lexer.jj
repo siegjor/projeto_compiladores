@@ -1,14 +1,29 @@
+options {
+    STATIC = false;
+    DEBUG_LOOKAHEAD = true;
+}
+
 PARSER_BEGIN(MyParser)
 class MyParser {
+  int contParseError = 0;
+
   public static void main( String[] args ) throws ParseException, TokenMgrError {
-    MyParser parser = new MyParser( System.in ) ;
-    parser.Start() ;
+        boolean debug = true;
+        MyParser parser = new MyParser( System.in ) ;
+
+        if (!debug) parser.disable_tracing();
+        try {
+            parser.program();
+        } catch(ParseException e) {
+            System.err.println(e.getMessage());
+        }
     }
 }
 PARSER_END(MyParser)
 
 SKIP : { " " | "\n" | "\r" | "\r\n" }
 
+/* Palavras reservadas */
 TOKEN:
 {
   < INT: "int" >
@@ -24,7 +39,12 @@ TOKEN:
 | < IF: "if" >
 | < ELSE: "else" >
 | < FOR: "for" >
-| < PLUS: "+" >
+}
+
+/* Operadores */
+TOKEN:
+{
+  < PLUS: "+" >
 | < MINUS: "-" >
 | < MULT: "*" >
 | < DIV: "/" >
@@ -44,54 +64,265 @@ TOKEN:
 | < LESSEQ: "<=" >
 | < DIFF: "!=" >
 | < MOD: "%" >
-| < ID: ["a" - "z", "A" - "Z"] (["a" - "z", "A" - "Z", "0" - "9"])* >
-| < STRING_CONST: "\"" (~["\""])* "\"" >
-| < FLOAT_CONST: (["0"-"9"])* "."(["0"-"9"])+ >
-| < INT_CONST: (["0"-"9"])+ >
 }
 
-void Start() :
-{Token t;}
+/* Identificadores */
+TOKEN :
 {
+  <#LETTER: ["a" - "z", "A" - "Z"]>
+| <#DIGIT: ["0"-"9"]>
+| < ID: <LETTER> (<LETTER> | <DIGIT>)* >
+| < INT_CONST: (<DIGIT>)+ >
+| < FLOAT_CONST: (<DIGIT>)* "."(<DIGIT>)+ >
+| < STRING_CONST: "\"" (~["\""])* "\"" >
+}
 
-  (
-    <DEF> {System.out.println("Palavra reservada: def");}
-  |  t=<ID> {System.out.println("Palavra reservada (id): " + t.image);}
-  |  <OPENP> {System.out.println("Palavra reservada: (");}
-  |  <CLOSEP> {System.out.println("Palavra reservada: )");}
-  |  <OPENCB> {System.out.println("Palavra reservada: {");}
-  |  <CLOSECB> {System.out.println("Palavra reservada: }");}
-  |  <INT> {System.out.println("Palavra reservada: int");}
-  |  <FLOAT> {System.out.println("Palavra reservada: float");}
-  |  <STRING> {System.out.println("Palavra reservada: string");}
-  |  <BREAK> {System.out.println("Palavra reservada: break");}
-  |  <PRINT> {System.out.println("Palavra reservada: print");}
-  |  <READ> {System.out.println("Palavra reservada: read");}
-  |  <RETURN> {System.out.println("Palavra reservada: return");}
-  |  <NEW> {System.out.println("Palavra reservada: new");}
-  |  <NULL> {System.out.println("Palavra reservada: null");}
-  |  <IF> {System.out.println("Palavra reservada: if");}
-  |  <ELSE> {System.out.println("Palavra reservada: else");}
-  |  <FOR> {System.out.println("Palavra reservada: for");}
-  |  <PLUS> {System.out.println("Palavra reservada: plus");}
-  |  <MINUS> {System.out.println("Palavra reservada: minus");}
-  |  <MULT> {System.out.println("Palavra reservada: mult");}
-  |  <DIV> {System.out.println("Palavra reservada: div");}
-  |  <OPENB> {System.out.println("Palavra reservada: (");}
-  |  <CLOSEB> {System.out.println("Palavra reservada: )");}
-  |  <COMMA> {System.out.println("Palavra reservada: ,");}
-  |  <SEMIC> {System.out.println("Palavra reservada: ;");}
-  |  <EQUALS> {System.out.println("Palavra reservada: ==");}
-  |  <ASSIGN> {System.out.println("Palavra reservada: =");}
-  |  <GREAT> {System.out.println("Palavra reservada: >");}
-  |  <LESS> {System.out.println("Palavra reservada: <");}
-  |  <GREATEQ> {System.out.println("Palavra reservada: >");}
-  |  <LESSEQ> {System.out.println("Palavra reservada: <");}
-  |  <DIFF> {System.out.println("Palavra reservada: !=");}
-  |  <MOD> {System.out.println("Palavra reservada: %");}
-  |  t=<INT_CONST> {System.out.println("Palavra reservada (int):" + t.image);}
-  |  t=<FLOAT_CONST> {System.out.println("Palavra reservada (float): " + t.image);}
-  |  t=<STRING_CONST> {System.out.println("Palavra reservada (string): " + t.image);}
-  )*
-  <EOF>
+//void Start() :
+//{Token t;}
+//{
+//
+//  (
+//    <DEF> {System.out.println("Palavra reservada: def");}
+//  |  t=<ID> {System.out.println("Palavra reservada (id): " + t.image);}
+//  |  <OPENP> {System.out.println("Palavra reservada: (");}
+//  |  <CLOSEP> {System.out.println("Palavra reservada: )");}
+//  |  <OPENCB> {System.out.println("Palavra reservada: {");}
+//  |  <CLOSECB> {System.out.println("Palavra reservada: }");}
+//  |  <INT> {System.out.println("Palavra reservada: int");}
+//  |  <FLOAT> {System.out.println("Palavra reservada: float");}
+//  |  <STRING> {System.out.println("Palavra reservada: string");}
+//  |  <BREAK> {System.out.println("Palavra reservada: break");}
+//  |  <PRINT> {System.out.println("Palavra reservada: print");}
+//  |  <READ> {System.out.println("Palavra reservada: read");}
+//  |  <RETURN> {System.out.println("Palavra reservada: return");}
+//  |  <NEW> {System.out.println("Palavra reservada: new");}
+//  |  <NULL> {System.out.println("Palavra reservada: null");}
+//  |  <IF> {System.out.println("Palavra reservada: if");}
+//  |  <ELSE> {System.out.println("Palavra reservada: else");}
+//  |  <FOR> {System.out.println("Palavra reservada: for");}
+//  |  <PLUS> {System.out.println("Palavra reservada: plus");}
+//  |  <MINUS> {System.out.println("Palavra reservada: minus");}
+//  |  <MULT> {System.out.println("Palavra reservada: mult");}
+//  |  <DIV> {System.out.println("Palavra reservada: div");}
+//  |  <OPENB> {System.out.println("Palavra reservada: (");}
+//  |  <CLOSEB> {System.out.println("Palavra reservada: )");}
+//  |  <COMMA> {System.out.println("Palavra reservada: ,");}
+//  |  <SEMIC> {System.out.println("Palavra reservada: ;");}
+//  |  <EQUALS> {System.out.println("Palavra reservada: ==");}
+//  |  <ASSIGN> {System.out.println("Palavra reservada: =");}
+//  |  <GREAT> {System.out.println("Palavra reservada: >");}
+//  |  <LESS> {System.out.println("Palavra reservada: <");}
+//  |  <GREATEQ> {System.out.println("Palavra reservada: >");}
+//  |  <LESSEQ> {System.out.println("Palavra reservada: <");}
+//  |  <DIFF> {System.out.println("Palavra reservada: !=");}
+//  |  <MOD> {System.out.println("Palavra reservada: %");}
+//  |  t=<INT_CONST> {System.out.println("Palavra reservada (int):" + t.image);}
+//  |  t=<FLOAT_CONST> {System.out.println("Palavra reservada (float): " + t.image);}
+//  |  t=<STRING_CONST> {System.out.println("Palavra reservada (string): " + t.image);}
+//  )*
+//  <EOF>
+//}
+
+void program():
+{}
+{
+    funclist() | statement() | {} <EOF>
+}
+
+void funclist():
+{}
+{
+    funcdef() funclist2()
+}
+
+void funclist2():
+{}
+{
+    funclist() | {}
+}
+
+void funcdef():
+{}
+{
+    <DEF> <ID> <OPENP> paramlist() <CLOSEP> <OPENCB> statelist() <CLOSECB>
+}
+
+void paramlist():
+{}
+{
+    (<INT> | <FLOAT> | <STRING> ) <ID> <COMMA> paramlist2() | {}
+}
+
+void paramlist2():
+{}
+{
+    <COMMA> paramlist() | {}
+}
+
+void statement():
+{}
+{
+    vardecl() <SEMIC> | atribstat() <SEMIC> | printstat() <SEMIC> | readstat() <SEMIC> | returnstat() <SEMIC> | ifstat() | forstat() | <OPENCB> statelist() <CLOSECB> | <BREAK> <SEMIC> | <SEMIC>
+}
+
+void vardecl():
+{}
+{
+    ( <INT> | <FLOAT> | <STRING>) <ID> ic()
+}
+
+void ic():
+{}
+{
+    <OPENB> <INT_CONST> <CLOSEB> ic() | {}
+}
+
+void atribstat():
+{}
+{
+    lvalue() <ASSIGN> (LOOKAHEAD(2) expression() | allocexpression() | funccal())
+}
+
+void funccal():
+{}
+{
+    <ID> <OPENP> paramlistcall() <CLOSEP>
+}
+
+void paramlistcall():
+{}
+{
+    <ID> paramlistcall2() | {}
+}
+
+void paramlistcall2():
+{}
+{
+    <COMMA> paramlistcall() | {}
+}
+
+void printstat():
+{}
+{
+    <PRINT> expression()
+}
+void readstat():
+{}
+{
+    <READ> lvalue()
+}
+
+void returnstat():
+{}
+{
+    <RETURN>
+}
+
+void ifstat():
+{}
+{
+    <IF> <OPENP> expression() <CLOSEP> statement() es()
+}
+
+void es():
+{}
+{
+    <ELSE> statement() | {}
+}
+
+void forstat():
+{}
+{
+    <FOR> <OPENP> atribstat()<SEMIC> expression() <SEMIC> atribstat() <CLOSEP> statement()
+}
+
+void statelist():
+{}
+{
+    statement() sl()
+}
+
+void sl():
+{}
+{
+    statelist() | {}
+}
+
+void allocexpression():
+{}
+{
+    <NEW> (<INT> | <FLOAT> | <STRING>) ne()
+}
+
+void ne():
+{}
+{
+    <OPENB> numexpression() <CLOSEB> ne()
+}
+
+void expression():
+{}
+{
+    numexpression() ned()
+}
+
+void ned():
+{}
+{
+    (<LESS> | <GREAT> | <LESSEQ> | <GREATEQ> | <EQUALS> | <DIFF> ) numexpression() | {}
+}
+
+void numexpression():
+{}
+{
+    term() ner()
+}
+
+void ner():
+{}
+{
+    (<PLUS> | <MINUS> ) term() ner() | {}
+}
+
+void term():
+{}
+{
+    unaryexpr() ue()
+}
+
+void ue():
+{}
+{
+    (<MULT> | <DIV> | <MOD> ) unaryexpr() ue() | {}
+}
+
+void unaryexpr():
+{}
+{
+    mn() factor()
+}
+
+
+void mn():
+{}
+{
+    <PLUS> | <MINUS> | {}
+}
+
+void factor():
+{}
+{
+    <INT_CONST> | <FLOAT_CONST> | <STRING_CONST> | <NULL> | lvalue() | <OPENP> numexpression() <CLOSEP>
+}
+
+void lvalue():
+{}
+{
+    <ID> net()
+}
+
+void net():
+{}
+{
+    <OPENB> numexpression() <CLOSEB> net() | {}
 }
