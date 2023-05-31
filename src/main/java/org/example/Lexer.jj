@@ -257,7 +257,7 @@ void allocexpression():
 void ne():
 {}
 {
-    <OPENB> numexpression() <CLOSEB> ne()
+    <OPENB> numexpression() <CLOSEB> (ne() | {})
 }
 
 void expression():
