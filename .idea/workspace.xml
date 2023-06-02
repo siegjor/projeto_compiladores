@@ -7,21 +7,40 @@
     <list default="true" id="83f0d6dd-3f97-4873-ab20-cf04070d7727" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Lexer.jj" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Lexer.jj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParser$JJCalls.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParser$LookaheadSuccess.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParser.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParserConstants.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParserConstants.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParserTokenManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/MyParserTokenManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ParseException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ParseException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/SimpleCharStream.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/SimpleCharStream.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Token.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Token.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/TokenMgrError.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/TokenMgrError.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
-  </component>
-  <component name="MavenImportPreferences">
-    <option name="importingSettings">
-      <MavenImportingSettings>
-        <option name="workspaceImportEnabled" value="true" />
-      </MavenImportingSettings>
-    </option>
   </component>
   <component name="ProjectId" id="2Q6tNBU6qbnrESg5xTcYIpwGnyE" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -31,12 +50,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "node.js.selected.package.tslint": "(autodetect)"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

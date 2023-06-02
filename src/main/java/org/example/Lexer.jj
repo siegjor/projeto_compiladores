@@ -3,6 +3,7 @@ options {
     DEBUG_LOOKAHEAD = true;
 }
 
+
 PARSER_BEGIN(MyParser)
 class MyParser {
   int contParseError = 0;
@@ -11,12 +12,34 @@ class MyParser {
         boolean debug = true;
         MyParser parser = new MyParser( System.in ) ;
 
+
+
         if (!debug) parser.disable_tracing();
         try {
             parser.program();
         } catch(ParseException e) {
             System.err.println(e.getMessage());
         }
+
+
+        Map<Integer, Simbolo> tabelaSimbolos =  new HashMap<Integer, Simbolo>();
+
+        final Object[][] table = new String[tabelaSimbolos.size][];
+              //Cabeçalho
+              table[0] = new String[] { "Nome Variavel", "Ocorrências", "Tipo Variavel" };
+              int n = 1;
+
+              // Linhhas com Simbolos
+              for( final Simbolo simbolo: tabelaSimbolos.values() ) {
+                  table[n] = new String[] { simbolo.getNomeVariavel(), simbolo.getOcorrencia().toString() , simbolo.getTipoVariavel() };
+                  n++;
+              };
+              // printa tabela de simbolos
+              for (final Object[] row : table) {
+                  System.out.format("%15s%15s%15s%n", row);
+              }
+
+
     }
 }
 PARSER_END(MyParser)
