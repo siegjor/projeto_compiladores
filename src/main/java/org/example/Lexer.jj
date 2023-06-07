@@ -1,4 +1,7 @@
-
+// Grupo:
+// - Cleberton Oliveira (17205083)
+// - Gabriel Bristot Loli (20100844)
+// - Kevin Rafael Velez Bernal (20102279)
 
 options {
     STATIC = false;
@@ -27,6 +30,14 @@ class MyParser {
         tokenList = new ArrayList<String>();
 
         if (!debug) parser.disable_tracing();
+
+        // Cabeçalho
+        System.out.println("\n-------------------------------------------");
+        System.out.println(">>> Trabalho feito por:");
+        System.out.println("--> Cleberton Oliveira (17205083)");
+        System.out.println("--> Gabriel Bristot Loli (20100844)");
+        System.out.println("--> Kevin Rafael Velez Bernal (20102279)");
+        System.out.println("-------------------------------------------\n");
 
         boolean emptyInput = false;
         try {
