@@ -9,9 +9,13 @@
 2. Rode ``make build`` para compilar os arquivos .java
 3. Rode ``make run`` para executar o programa
 4. Se necessário, rode ``make clean`` para deletar os arquivos gerados
-   1) **CUIDADO**: isso irá deletar todos os arquivos gerados,
-   até os gerados pelo JavaCC, ou seja, para gerá-los novamente,
-   será necessário ter o JavaCC instalado!
+
+**CUIDADO**: ``make clean`` irá deletar todos os arquivos gerados,
+até os gerados pelo JavaCC, ou seja, para gerá-los novamente,
+será necessário ter o JavaCC instalado!
+
+**OBS:** Rodando ``make all`` irá executar os comandos *compile*, 
+*build* e *run* ao mesmo tempo
 
 ### Usando outros programas .lcc como input
 No arquivo "Makefile" há três variáveis diferentes, PROGRAM1,
