@@ -10,7 +10,7 @@ class MyParser implements MyParserConstants {
     private static StringBuilder sententialForm = new StringBuilder();
 
   public static void main( String[] args ) throws ParseException, TokenMgrError {
-        boolean debug = true;
+        boolean debug = false;
         boolean hasLexicalError = false;
         boolean hasSyntaxError = false;
         MyParser parser = new MyParser( System.in ) ;
@@ -45,13 +45,12 @@ class MyParser implements MyParserConstants {
         if (!hasLexicalError) {
             System.out.println("\n>> Successo! Sem erros l\u00e9xicos.");
             System.out.println("Lista de tokens:");
-            System.out.println(tokenList);
+            System.out.println("\n" + tokenList);
 
             System.out.println("\nTabela de s\u00edmbolos:");
             for (ArrayList<String> list : symbolTable.values()) {
                 System.out.println("S\u00edmbolo: '" + list.get(0) + "', " + list.get(1) + " ocorr\u00eancias");
             }
-            System.out.println("\n" + tokenList);
         }
 
         if (!hasSyntaxError) {
@@ -1266,13 +1265,13 @@ class MyParser implements MyParserConstants {
     { if (!jj_rescan) trace_return("stringConstToken(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_1()) return true;
+  private boolean jj_3R_13() {
+    if (jj_3R_21()) return true;
     return false;
   }
 
-  private boolean jj_3R_13() {
-    if (jj_3R_21()) return true;
+  private boolean jj_3_1() {
+    if (jj_3R_1()) return true;
     return false;
   }
 

@@ -17,7 +17,7 @@ class MyParser {
     private static StringBuilder sententialForm = new StringBuilder();
 
   public static void main( String[] args ) throws ParseException, TokenMgrError {
-        boolean debug = true;
+        boolean debug = false;
         boolean hasLexicalError = false;
         boolean hasSyntaxError = false;
         MyParser parser = new MyParser( System.in ) ;
@@ -52,13 +52,12 @@ class MyParser {
         if (!hasLexicalError) {
             System.out.println("\n>> Successo! Sem erros léxicos.");
             System.out.println("Lista de tokens:");
-            System.out.println(tokenList);
+            System.out.println("\n" + tokenList);
 
             System.out.println("\nTabela de símbolos:");
             for (ArrayList<String> list : symbolTable.values()) {
                 System.out.println("Símbolo: '" + list.get(0) + "', " + list.get(1) + " ocorrências");
             }
-            System.out.println("\n" + tokenList);
         }
 
         if (!hasSyntaxError) {
