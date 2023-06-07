@@ -1,7 +1,7 @@
 ### Pré-requisitos
 * Java 18.0.2.1 2022-08-18
 * Make
-* JavaCC
+* (JavaCC não é necessário, a menos que se queira gerar o parser novamente)
 
 ### Como executar o código
 Rode ``make run`` para rodar o programa
