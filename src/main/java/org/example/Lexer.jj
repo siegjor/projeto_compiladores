@@ -9,17 +9,19 @@ PARSER_BEGIN(MyParser)
 import java.util.ArrayList;import java.util.HashMap;
 import java.util.Map;
 
-
-
 class MyParser {
     private static Map<String, ArrayList<String>> symbolTable;
     private static ArrayList<String> tokenList;
     private static StringBuilder sententialForm = new StringBuilder();
 
   public static void main( String[] args ) throws ParseException, TokenMgrError {
+        // Habilite essa opção para gerar o log da árvore sintática
         boolean debug = false;
+
+        // Usados para saber se houve erros na execução
         boolean hasLexicalError = false;
         boolean hasSyntaxError = false;
+
         MyParser parser = new MyParser( System.in ) ;
         symbolTable = new HashMap<String, ArrayList<String>>();
         tokenList = new ArrayList<String>();
@@ -28,8 +30,10 @@ class MyParser {
 
         boolean emptyInput = false;
         try {
+            // Executa o parser
             parser.program();
         } catch (ParseException e) {
+            // Em caso de erro na análise sintática
             hasSyntaxError = true;
             if (parser.token == null) {
                 emptyInput = true;
@@ -41,6 +45,7 @@ class MyParser {
                 System.out.println("Token da entrada que causou o erro: " + e.currentToken.image + "\n");
             }
         } catch (TokenMgrError e) {
+            // Em caso de erro na análise léxica
             hasLexicalError = true;
             System.out.println("\nErro de análise léxica: " + e.getMessage());
         }
@@ -134,25 +139,8 @@ TOKEN :
 | < STRING_CONST: "\"" (~["\""])* "\"" >
 }
 
-void idToken(String type):
-{Token t;}
-{
-    t=<ID> {
-    tokenList.add("ID");
-    if (symbolTable.containsKey(t.image)) {
-        Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
-        symbolCount++;
-        symbolTable.get(t.image).set(1, symbolCount.toString());
-    } else {
-        ArrayList<String> data = new ArrayList<String>();
-        data.add(t.image);
-//        data.add(type);
-        data.add("1");
-        symbolTable.put(t.image, data);
-    }
-}
-}
-
+// Produções
+// (o "{}" representa a palavra vazia)
 void program():
 {}
 {
@@ -178,7 +166,7 @@ void funcdef():
 {}
 {
     {addToSententialForm("funcdef");}
-    defToken() idToken("function") <OPENP> paramlist() <CLOSEP> <OPENCB> statelist() <CLOSECB>
+    defToken() idToken("function") openpToken() paramlist() closepToken() opencbToken() statelist() closecbToken()
 }
 
 void paramlist():
@@ -250,6 +238,7 @@ void printstat():
     {addToSententialForm("printstat");}
     printToken() expression()
 }
+
 void readstat():
 {}
 {
@@ -390,12 +379,32 @@ void net():
     openbToken() numexpression() closebToken() net() | {}
 }
 
+
+// A partir daqui há os tokens, que foram colocados em funções para que fosse possível executar código java
+// quando cada um deles é encontrado pelo parser.
+
+void idToken(String type):
+{Token t;}
+{
+    t=<ID> {
+    tokenList.add("ID");
+    if (symbolTable.containsKey(t.image)) {
+        Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
+        symbolCount++;
+        symbolTable.get(t.image).set(1, symbolCount.toString());
+    } else {
+        ArrayList<String> data = new ArrayList<String>();
+        data.add(t.image);
+        data.add("1");
+        symbolTable.put(t.image, data);
+    }
+}
+}
 void intToken():
 {}
 {
     <INT> {tokenList.add("INT");}
 }
-
 void floatToken():
 {}
 {
@@ -556,20 +565,17 @@ void modToken():
 {
     <MOD> {tokenList.add("MOD");}
 }
-
 void intConstToken():
  {}
  {
      <INT_CONST> {tokenList.add("INT_CONST");}
  }
-
- void floatConstToken():
+void floatConstToken():
  {}
  {
      <FLOAT_CONST> {tokenList.add("FLOAT_CONST");}
  }
-
- void stringConstToken():
+void stringConstToken():
  {}
  {
      <STRING_CONST> {tokenList.add("STRING_CONST");}
