@@ -6,32 +6,75 @@ import java.util.Map;
 
 class MyParser implements MyParserConstants {
     private static Map<String, ArrayList<String>> symbolTable;
+    private static ArrayList<String> tokenList;
+    private static StringBuilder sententialForm = new StringBuilder();
 
   public static void main( String[] args ) throws ParseException, TokenMgrError {
         boolean debug = true;
+        boolean hasLexicalError = false;
+        boolean hasSyntaxError = false;
         MyParser parser = new MyParser( System.in ) ;
         symbolTable = new HashMap<String, ArrayList<String>>();
+        tokenList = new ArrayList<String>();
+
         if (!debug) parser.disable_tracing();
+
+        boolean emptyInput = false;
         try {
             parser.program();
-        } catch(ParseException e) {
-            System.err.println(e.getMessage());
+        } catch (ParseException e) {
+            hasSyntaxError = true;
+            if (parser.token == null) {
+                emptyInput = true;
+            } else {
+                System.out.println("\nErro de an\u00e1lise sint\u00e1tica: " + e.getMessage());
+                System.out.println("Falha na linha: " + e.currentToken.beginLine + ", coluna: " + e.currentToken.beginColumn);
+                System.out.println("Forma sentencial alfa: " + sententialForm.toString());
+                System.out.println("S\u00edmbolo n\u00e3o-terminal mais \u00e0 esquerda de alfa: " + e.currentToken.next.image);
+                System.out.println("Token da entrada que causou o erro: " + e.currentToken.image + "\n");
+            }
+        } catch (TokenMgrError e) {
+            hasLexicalError = true;
+            System.out.println("\nErro de an\u00e1lise l\u00e9xica: " + e.getMessage());
         }
 
-        for (ArrayList<String> list : symbolTable.values()) {
+        if (emptyInput) {
+            System.out.println("Erro de an\u00e1lise sint\u00e1tica: entrada vazia na tabela de reconhecimento");
+        }
 
-            System.out.println("nome: " + list.get(0));
-//            System.out.println("tipo: " + list.get(1));
-            System.out.println("ocorrencias: " + list.get(1));
-            System.out.println();
+        if (!hasLexicalError) {
+            System.out.println("\n>> Successo! Sem erros l\u00e9xicos.");
+            System.out.println("Lista de tokens:");
+            System.out.println(tokenList);
+
+            System.out.println("\nTabela de s\u00edmbolos:");
+            for (ArrayList<String> list : symbolTable.values()) {
+                System.out.println("S\u00edmbolo: '" + list.get(0) + "', " + list.get(1) + " ocorr\u00eancias");
+            }
+            System.out.println("\n" + tokenList);
+        }
+
+        if (!hasSyntaxError) {
+            System.out.println("\n>> Successo! Sem erros sint\u00e1ticos.");
         }
     }
 
-  final public void id(String type) throws ParseException {
-    trace_call("id");
+    private static void addTokenToList(String tokenName) {
+        if (!tokenList.contains(tokenName)) {
+            tokenList.add(tokenName);
+        }
+    }
+
+    private static void addToSententialForm(String symbol) {
+        sententialForm.append(symbol).append(" ");
+    }
+
+  final public void idToken(String type) throws ParseException {
+    trace_call("idToken");
     try {
  Token t;
       t = jj_consume_token(ID);
+    tokenList.add("ID");
     if (symbolTable.containsKey(t.image)) {
         Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
         symbolCount++;
@@ -44,7 +87,7 @@ class MyParser implements MyParserConstants {
         symbolTable.put(t.image, data);
     }
     } finally {
-      trace_return("id");
+      trace_return("idToken");
     }
   }
 
@@ -53,6 +96,7 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DEF:
+     addToSententialForm("program");
         funclist();
         break;
       case INT:
@@ -71,7 +115,6 @@ class MyParser implements MyParserConstants {
         break;
       case 0:
 
-
         jj_consume_token(0);
         break;
       default:
@@ -87,6 +130,7 @@ class MyParser implements MyParserConstants {
   final public void funclist() throws ParseException {
     trace_call("funclist");
     try {
+     addToSententialForm("funclist");
       funcdef();
       funclist2();
     } finally {
@@ -99,6 +143,7 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DEF:
+     addToSententialForm("funclist2");
         funclist();
         break;
       default:
@@ -113,8 +158,9 @@ class MyParser implements MyParserConstants {
   final public void funcdef() throws ParseException {
     trace_call("funcdef");
     try {
-      jj_consume_token(DEF);
-      id("function");
+     addToSententialForm("funcdef");
+      defToken();
+      idToken("function");
       jj_consume_token(OPENP);
       paramlist();
       jj_consume_token(CLOSEP);
@@ -133,23 +179,24 @@ class MyParser implements MyParserConstants {
       case INT:
       case FLOAT:
       case STRING:
+     addToSententialForm("paramlist");
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case INT:
-          jj_consume_token(INT);
+          intToken();
           break;
         case FLOAT:
-          jj_consume_token(FLOAT);
+          floatToken();
           break;
         case STRING:
-          jj_consume_token(STRING);
+          stringToken();
           break;
         default:
           jj_la1[2] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
-        id("parameter");
-        jj_consume_token(COMMA);
+        idToken("parameter");
+        commaToken();
         paramlist2();
         break;
       default:
@@ -166,7 +213,8 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
-        jj_consume_token(COMMA);
+     addToSententialForm("paramlist2");
+        commaToken();
         paramlist();
         break;
       default:
@@ -185,24 +233,25 @@ class MyParser implements MyParserConstants {
       case INT:
       case FLOAT:
       case STRING:
+     addToSententialForm("statement");
         vardecl();
-        jj_consume_token(SEMIC);
+        semicToken();
         break;
       case ID:
         atribstat();
-        jj_consume_token(SEMIC);
+        semicToken();
         break;
       case PRINT:
         printstat();
-        jj_consume_token(SEMIC);
+        semicToken();
         break;
       case READ:
         readstat();
-        jj_consume_token(SEMIC);
+        semicToken();
         break;
       case RETURN:
         returnstat();
-        jj_consume_token(SEMIC);
+        semicToken();
         break;
       case IF:
         ifstat();
@@ -211,16 +260,16 @@ class MyParser implements MyParserConstants {
         forstat();
         break;
       case OPENCB:
-        jj_consume_token(OPENCB);
+        opencbToken();
         statelist();
-        jj_consume_token(CLOSECB);
+        closecbToken();
         break;
       case BREAK:
-        jj_consume_token(BREAK);
-        jj_consume_token(SEMIC);
+        breakToken();
+        semicToken();
         break;
       case SEMIC:
-        jj_consume_token(SEMIC);
+        semicToken();
         break;
       default:
         jj_la1[5] = jj_gen;
@@ -235,22 +284,23 @@ class MyParser implements MyParserConstants {
   final public void vardecl() throws ParseException {
     trace_call("vardecl");
     try {
+     addToSententialForm("vardecl");
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INT:
-        jj_consume_token(INT);
+        intToken();
         break;
       case FLOAT:
-        jj_consume_token(FLOAT);
+        floatToken();
         break;
       case STRING:
-        jj_consume_token(STRING);
+        stringToken();
         break;
       default:
         jj_la1[6] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-      id("variable");
+      idToken("variable");
       ic();
     } finally {
       trace_return("vardecl");
@@ -262,9 +312,10 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPENB:
-        jj_consume_token(OPENB);
-        jj_consume_token(INT_CONST);
-        jj_consume_token(CLOSEB);
+     addToSententialForm("ic");
+        openbToken();
+        intConstToken();
+        closebToken();
         ic();
         break;
       default:
@@ -279,8 +330,9 @@ class MyParser implements MyParserConstants {
   final public void atribstat() throws ParseException {
     trace_call("atribstat");
     try {
+     addToSententialForm("atribstat");
       lvalue();
-      jj_consume_token(ASSIGN);
+      assignToken();
       if (jj_2_1(2)) {
         expression();
       } else {
@@ -305,10 +357,11 @@ class MyParser implements MyParserConstants {
   final public void funccal() throws ParseException {
     trace_call("funccal");
     try {
-      id("function");
-      jj_consume_token(OPENP);
+     addToSententialForm("funccal");
+      idToken("function");
+      openpToken();
       paramlistcall();
-      jj_consume_token(CLOSEP);
+      closepToken();
     } finally {
       trace_return("funccal");
     }
@@ -319,7 +372,8 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ID:
-        id("parameter");
+     addToSententialForm("paramlistcall");
+        idToken("parameter");
         paramlistcall2();
         break;
       default:
@@ -336,7 +390,8 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
-        jj_consume_token(COMMA);
+     addToSententialForm("paramlistcall2");
+        commaToken();
         paramlistcall();
         break;
       default:
@@ -351,7 +406,8 @@ class MyParser implements MyParserConstants {
   final public void printstat() throws ParseException {
     trace_call("printstat");
     try {
-      jj_consume_token(PRINT);
+     addToSententialForm("printstat");
+      printToken();
       expression();
     } finally {
       trace_return("printstat");
@@ -361,7 +417,8 @@ class MyParser implements MyParserConstants {
   final public void readstat() throws ParseException {
     trace_call("readstat");
     try {
-      jj_consume_token(READ);
+     addToSententialForm("readstat");
+      readToken();
       lvalue();
     } finally {
       trace_return("readstat");
@@ -371,7 +428,8 @@ class MyParser implements MyParserConstants {
   final public void returnstat() throws ParseException {
     trace_call("returnstat");
     try {
-      jj_consume_token(RETURN);
+     addToSententialForm("returnstat");
+      returnToken();
     } finally {
       trace_return("returnstat");
     }
@@ -380,10 +438,11 @@ class MyParser implements MyParserConstants {
   final public void ifstat() throws ParseException {
     trace_call("ifstat");
     try {
-      jj_consume_token(IF);
-      jj_consume_token(OPENP);
+     addToSententialForm("ifstat");
+      ifToken();
+      openpToken();
       expression();
-      jj_consume_token(CLOSEP);
+      closepToken();
       statement();
       es();
     } finally {
@@ -396,7 +455,8 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ELSE:
-        jj_consume_token(ELSE);
+     addToSententialForm("es");
+        elseToken();
         statement();
         break;
       default:
@@ -411,14 +471,15 @@ class MyParser implements MyParserConstants {
   final public void forstat() throws ParseException {
     trace_call("forstat");
     try {
-      jj_consume_token(FOR);
-      jj_consume_token(OPENP);
+     addToSententialForm("forstat");
+      forToken();
+      openpToken();
       atribstat();
-      jj_consume_token(SEMIC);
+      semicToken();
       expression();
-      jj_consume_token(SEMIC);
+      semicToken();
       atribstat();
-      jj_consume_token(CLOSEP);
+      closepToken();
       statement();
     } finally {
       trace_return("forstat");
@@ -428,6 +489,7 @@ class MyParser implements MyParserConstants {
   final public void statelist() throws ParseException {
     trace_call("statelist");
     try {
+     addToSententialForm("statelist");
       statement();
       sl();
     } finally {
@@ -451,6 +513,7 @@ class MyParser implements MyParserConstants {
       case OPENCB:
       case SEMIC:
       case ID:
+     addToSententialForm("sl");
         statelist();
         break;
       default:
@@ -465,16 +528,17 @@ class MyParser implements MyParserConstants {
   final public void allocexpression() throws ParseException {
     trace_call("allocexpression");
     try {
-      jj_consume_token(NEW);
+     addToSententialForm("allocexpression");
+      newToken();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INT:
-        jj_consume_token(INT);
+        intToken();
         break;
       case FLOAT:
-        jj_consume_token(FLOAT);
+        floatToken();
         break;
       case STRING:
-        jj_consume_token(STRING);
+        stringToken();
         break;
       default:
         jj_la1[13] = jj_gen;
@@ -490,9 +554,10 @@ class MyParser implements MyParserConstants {
   final public void ne() throws ParseException {
     trace_call("ne");
     try {
-      jj_consume_token(OPENB);
+     addToSententialForm("ne");
+      openbToken();
       numexpression();
-      jj_consume_token(CLOSEB);
+      closebToken();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPENB:
         ne();
@@ -509,6 +574,7 @@ class MyParser implements MyParserConstants {
   final public void expression() throws ParseException {
     trace_call("expression");
     try {
+     addToSententialForm("numexpression");
       numexpression();
       ned();
     } finally {
@@ -526,24 +592,25 @@ class MyParser implements MyParserConstants {
       case GREATEQ:
       case LESSEQ:
       case DIFF:
+     addToSententialForm("ned");
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case LESS:
-          jj_consume_token(LESS);
+          lessToken();
           break;
         case GREAT:
-          jj_consume_token(GREAT);
+          greatToken();
           break;
         case LESSEQ:
-          jj_consume_token(LESSEQ);
+          lesseqToken();
           break;
         case GREATEQ:
-          jj_consume_token(GREATEQ);
+          greateqToken();
           break;
         case EQUALS:
-          jj_consume_token(EQUALS);
+          equalsToken();
           break;
         case DIFF:
-          jj_consume_token(DIFF);
+          diffToken();
           break;
         default:
           jj_la1[15] = jj_gen;
@@ -564,6 +631,7 @@ class MyParser implements MyParserConstants {
   final public void numexpression() throws ParseException {
     trace_call("numexpression");
     try {
+     addToSententialForm("numexpression");
       term();
       ner();
     } finally {
@@ -577,12 +645,13 @@ class MyParser implements MyParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case PLUS:
       case MINUS:
+     addToSententialForm("ner");
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case PLUS:
-          jj_consume_token(PLUS);
+          plusToken();
           break;
         case MINUS:
-          jj_consume_token(MINUS);
+          minusToken();
           break;
         default:
           jj_la1[17] = jj_gen;
@@ -604,6 +673,7 @@ class MyParser implements MyParserConstants {
   final public void term() throws ParseException {
     trace_call("term");
     try {
+     addToSententialForm("term");
       unaryexpr();
       ue();
     } finally {
@@ -618,15 +688,16 @@ class MyParser implements MyParserConstants {
       case MULT:
       case DIV:
       case MOD:
+     addToSententialForm("ue");
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case MULT:
-          jj_consume_token(MULT);
+          multToken();
           break;
         case DIV:
-          jj_consume_token(DIV);
+          divToken();
           break;
         case MOD:
-          jj_consume_token(MOD);
+          modToken();
           break;
         default:
           jj_la1[19] = jj_gen;
@@ -648,6 +719,7 @@ class MyParser implements MyParserConstants {
   final public void unaryexpr() throws ParseException {
     trace_call("unaryexpr");
     try {
+     addToSententialForm("unaryexpr");
       mn();
       factor();
     } finally {
@@ -660,10 +732,11 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case PLUS:
-        jj_consume_token(PLUS);
+     addToSententialForm("mn");
+        plusToken();
         break;
       case MINUS:
-        jj_consume_token(MINUS);
+        minusToken();
         break;
       default:
         jj_la1[21] = jj_gen;
@@ -679,24 +752,25 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case INT_CONST:
-        jj_consume_token(INT_CONST);
+     addToSententialForm("factor");
+        intConstToken();
         break;
       case FLOAT_CONST:
-        jj_consume_token(FLOAT_CONST);
+        floatConstToken();
         break;
       case STRING_CONST:
-        jj_consume_token(STRING_CONST);
+        stringConstToken();
         break;
       case NULL:
-        jj_consume_token(NULL);
+        nullToken();
         break;
       case ID:
         lvalue();
         break;
       case OPENP:
-        jj_consume_token(OPENP);
+        openpToken();
         numexpression();
-        jj_consume_token(CLOSEP);
+        closepToken();
         break;
       default:
         jj_la1[22] = jj_gen;
@@ -711,7 +785,8 @@ class MyParser implements MyParserConstants {
   final public void lvalue() throws ParseException {
     trace_call("lvalue");
     try {
-      id("lvalue");
+     addToSententialForm("lvalue");
+      idToken("lvalue");
       net();
     } finally {
       trace_return("lvalue");
@@ -723,9 +798,10 @@ class MyParser implements MyParserConstants {
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OPENB:
-        jj_consume_token(OPENB);
+     addToSententialForm("net");
+        openbToken();
         numexpression();
-        jj_consume_token(CLOSEB);
+        closebToken();
         net();
         break;
       default:
@@ -737,6 +813,366 @@ class MyParser implements MyParserConstants {
     }
   }
 
+  final public void intToken() throws ParseException {
+    trace_call("intToken");
+    try {
+      jj_consume_token(INT);
+           tokenList.add("INT");
+    } finally {
+      trace_return("intToken");
+    }
+  }
+
+  final public void floatToken() throws ParseException {
+    trace_call("floatToken");
+    try {
+      jj_consume_token(FLOAT);
+             tokenList.add("FLOAT");
+    } finally {
+      trace_return("floatToken");
+    }
+  }
+
+  final public void stringToken() throws ParseException {
+    trace_call("stringToken");
+    try {
+      jj_consume_token(STRING);
+              tokenList.add("STRING");
+    } finally {
+      trace_return("stringToken");
+    }
+  }
+
+  final public void defToken() throws ParseException {
+    trace_call("defToken");
+    try {
+      jj_consume_token(DEF);
+           tokenList.add("DEF");
+    } finally {
+      trace_return("defToken");
+    }
+  }
+
+  final public void breakToken() throws ParseException {
+    trace_call("breakToken");
+    try {
+      jj_consume_token(BREAK);
+             tokenList.add("BREAK");
+    } finally {
+      trace_return("breakToken");
+    }
+  }
+
+  final public void printToken() throws ParseException {
+    trace_call("printToken");
+    try {
+      jj_consume_token(PRINT);
+             tokenList.add("PRINT");
+    } finally {
+      trace_return("printToken");
+    }
+  }
+
+  final public void readToken() throws ParseException {
+    trace_call("readToken");
+    try {
+      jj_consume_token(READ);
+            tokenList.add("READ");
+    } finally {
+      trace_return("readToken");
+    }
+  }
+
+  final public void returnToken() throws ParseException {
+    trace_call("returnToken");
+    try {
+      jj_consume_token(RETURN);
+              tokenList.add("RETURN");
+    } finally {
+      trace_return("returnToken");
+    }
+  }
+
+  final public void newToken() throws ParseException {
+    trace_call("newToken");
+    try {
+      jj_consume_token(NEW);
+           tokenList.add("NEW");
+    } finally {
+      trace_return("newToken");
+    }
+  }
+
+  final public void nullToken() throws ParseException {
+    trace_call("nullToken");
+    try {
+      jj_consume_token(NULL);
+            tokenList.add("NULL");
+    } finally {
+      trace_return("nullToken");
+    }
+  }
+
+  final public void ifToken() throws ParseException {
+    trace_call("ifToken");
+    try {
+      jj_consume_token(IF);
+          tokenList.add("IF");
+    } finally {
+      trace_return("ifToken");
+    }
+  }
+
+  final public void elseToken() throws ParseException {
+    trace_call("elseToken");
+    try {
+      jj_consume_token(ELSE);
+            tokenList.add("ELSE");
+    } finally {
+      trace_return("elseToken");
+    }
+  }
+
+  final public void forToken() throws ParseException {
+    trace_call("forToken");
+    try {
+      jj_consume_token(FOR);
+           tokenList.add("FOR");
+    } finally {
+      trace_return("forToken");
+    }
+  }
+
+  final public void plusToken() throws ParseException {
+    trace_call("plusToken");
+    try {
+      jj_consume_token(PLUS);
+            tokenList.add("PLUS");
+    } finally {
+      trace_return("plusToken");
+    }
+  }
+
+  final public void minusToken() throws ParseException {
+    trace_call("minusToken");
+    try {
+      jj_consume_token(MINUS);
+             tokenList.add("MINUS");
+    } finally {
+      trace_return("minusToken");
+    }
+  }
+
+  final public void multToken() throws ParseException {
+    trace_call("multToken");
+    try {
+      jj_consume_token(MULT);
+            tokenList.add("MULT");
+    } finally {
+      trace_return("multToken");
+    }
+  }
+
+  final public void divToken() throws ParseException {
+    trace_call("divToken");
+    try {
+      jj_consume_token(DIV);
+           tokenList.add("DIV");
+    } finally {
+      trace_return("divToken");
+    }
+  }
+
+  final public void openpToken() throws ParseException {
+    trace_call("openpToken");
+    try {
+      jj_consume_token(OPENP);
+             tokenList.add("OPENP");
+    } finally {
+      trace_return("openpToken");
+    }
+  }
+
+  final public void closepToken() throws ParseException {
+    trace_call("closepToken");
+    try {
+      jj_consume_token(CLOSEP);
+              tokenList.add("CLOSEP");
+    } finally {
+      trace_return("closepToken");
+    }
+  }
+
+  final public void openbToken() throws ParseException {
+    trace_call("openbToken");
+    try {
+      jj_consume_token(OPENB);
+             tokenList.add("OPENB");
+    } finally {
+      trace_return("openbToken");
+    }
+  }
+
+  final public void closebToken() throws ParseException {
+    trace_call("closebToken");
+    try {
+      jj_consume_token(CLOSEB);
+              tokenList.add("CLOSEB");
+    } finally {
+      trace_return("closebToken");
+    }
+  }
+
+  final public void opencbToken() throws ParseException {
+    trace_call("opencbToken");
+    try {
+      jj_consume_token(OPENCB);
+              tokenList.add("OPENCB");
+    } finally {
+      trace_return("opencbToken");
+    }
+  }
+
+  final public void closecbToken() throws ParseException {
+    trace_call("closecbToken");
+    try {
+      jj_consume_token(CLOSECB);
+               tokenList.add("CLOSECB");
+    } finally {
+      trace_return("closecbToken");
+    }
+  }
+
+  final public void semicToken() throws ParseException {
+    trace_call("semicToken");
+    try {
+      jj_consume_token(SEMIC);
+             tokenList.add("SEMIC");
+    } finally {
+      trace_return("semicToken");
+    }
+  }
+
+  final public void commaToken() throws ParseException {
+    trace_call("commaToken");
+    try {
+      jj_consume_token(COMMA);
+             tokenList.add("COMMA");
+    } finally {
+      trace_return("commaToken");
+    }
+  }
+
+  final public void equalsToken() throws ParseException {
+    trace_call("equalsToken");
+    try {
+      jj_consume_token(EQUALS);
+              tokenList.add("EQUALS");
+    } finally {
+      trace_return("equalsToken");
+    }
+  }
+
+  final public void assignToken() throws ParseException {
+    trace_call("assignToken");
+    try {
+      jj_consume_token(ASSIGN);
+              tokenList.add("ASSIGN");
+    } finally {
+      trace_return("assignToken");
+    }
+  }
+
+  final public void greatToken() throws ParseException {
+    trace_call("greatToken");
+    try {
+      jj_consume_token(GREAT);
+             tokenList.add("GREAT");
+    } finally {
+      trace_return("greatToken");
+    }
+  }
+
+  final public void greateqToken() throws ParseException {
+    trace_call("greateqToken");
+    try {
+      jj_consume_token(GREATEQ);
+               tokenList.add("GREATEQ");
+    } finally {
+      trace_return("greateqToken");
+    }
+  }
+
+  final public void lessToken() throws ParseException {
+    trace_call("lessToken");
+    try {
+      jj_consume_token(LESS);
+            tokenList.add("LESS");
+    } finally {
+      trace_return("lessToken");
+    }
+  }
+
+  final public void lesseqToken() throws ParseException {
+    trace_call("lesseqToken");
+    try {
+      jj_consume_token(LESSEQ);
+              tokenList.add("LESSEQ");
+    } finally {
+      trace_return("lesseqToken");
+    }
+  }
+
+  final public void diffToken() throws ParseException {
+    trace_call("diffToken");
+    try {
+      jj_consume_token(DIFF);
+            tokenList.add("DIFF");
+    } finally {
+      trace_return("diffToken");
+    }
+  }
+
+  final public void modToken() throws ParseException {
+    trace_call("modToken");
+    try {
+      jj_consume_token(MOD);
+           tokenList.add("MOD");
+    } finally {
+      trace_return("modToken");
+    }
+  }
+
+  final public void intConstToken() throws ParseException {
+    trace_call("intConstToken");
+    try {
+      jj_consume_token(INT_CONST);
+                  tokenList.add("INT_CONST");
+    } finally {
+      trace_return("intConstToken");
+    }
+  }
+
+  final public void floatConstToken() throws ParseException {
+    trace_call("floatConstToken");
+    try {
+      jj_consume_token(FLOAT_CONST);
+                    tokenList.add("FLOAT_CONST");
+    } finally {
+      trace_return("floatConstToken");
+    }
+  }
+
+  final public void stringConstToken() throws ParseException {
+    trace_call("stringConstToken");
+    try {
+      jj_consume_token(STRING_CONST);
+                     tokenList.add("STRING_CONST");
+    } finally {
+      trace_return("stringConstToken");
+    }
+  }
+
   private boolean jj_2_1(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_1(); }
@@ -745,6 +1181,43 @@ class MyParser implements MyParserConstants {
   }
 
   private boolean jj_3R_7() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_5() {
+    if (!jj_rescan) trace_call("mn(LOOKING AHEAD...)");
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_8()) {
+    jj_scanpos = xsp;
+    if (jj_3R_9()) { if (!jj_rescan) trace_return("mn(LOOKAHEAD FAILED)"); return true; }
+    }
+    }
+    { if (!jj_rescan) trace_return("mn(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_16() {
+    if (!jj_rescan) trace_call("plusToken(LOOKING AHEAD...)");
+    if (jj_scan_token(PLUS)) { if (!jj_rescan) trace_return("plusToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("plusToken(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_12() {
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_1() {
+    if (!jj_rescan) trace_call("expression(LOOKING AHEAD...)");
+    if (jj_3R_2()) { if (!jj_rescan) trace_return("expression(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("expression(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_15() {
+    if (jj_3R_23()) return true;
     return false;
   }
 
@@ -755,55 +1228,19 @@ class MyParser implements MyParserConstants {
     { if (!jj_rescan) trace_return("unaryexpr(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
-  private boolean jj_3R_8() {
-    if (jj_3R_10()) return true;
+  private boolean jj_3R_14() {
+    if (jj_3R_22()) return true;
     return false;
   }
 
-  private boolean jj_3R_2() {
-    if (!jj_rescan) trace_call("numexpression(LOOKING AHEAD...)");
-    if (jj_3R_3()) { if (!jj_rescan) trace_return("numexpression(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("numexpression(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_10() {
-    if (!jj_rescan) trace_call("lvalue(LOOKING AHEAD...)");
-    if (jj_3R_11()) { if (!jj_rescan) trace_return("lvalue(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("lvalue(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3R_11() {
-    if (!jj_rescan) trace_call("id(LOOKING AHEAD...)");
-    if (jj_scan_token(ID)) { if (!jj_rescan) trace_return("id(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("id(LOOKAHEAD SUCCEEDED)"); return false; }
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_1()) return true;
+  private boolean jj_3R_9() {
     return false;
   }
 
-  private boolean jj_3R_6() {
-    if (!jj_rescan) trace_call("factor(LOOKING AHEAD...)");
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(41)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(42)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(43)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(14)) {
-    jj_scanpos = xsp;
-    if (jj_3R_8()) {
-    jj_scanpos = xsp;
-    if (jj_3R_9()) { if (!jj_rescan) trace_return("factor(LOOKAHEAD FAILED)"); return true; }
-    }
-    }
-    }
-    }
-    }
-    { if (!jj_rescan) trace_return("factor(LOOKAHEAD SUCCEEDED)"); return false; }
+  private boolean jj_3R_21() {
+    if (!jj_rescan) trace_call("nullToken(LOOKING AHEAD...)");
+    if (jj_scan_token(NULL)) { if (!jj_rescan) trace_return("nullToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("nullToken(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   private boolean jj_3R_3() {
@@ -812,29 +1249,100 @@ class MyParser implements MyParserConstants {
     { if (!jj_rescan) trace_return("term(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
-  private boolean jj_3R_9() {
-    if (jj_scan_token(OPENP)) return true;
+  private boolean jj_3R_11() {
+    if (jj_3R_19()) return true;
     return false;
   }
 
-  private boolean jj_3R_1() {
-    if (!jj_rescan) trace_call("expression(LOOKING AHEAD...)");
-    if (jj_3R_2()) { if (!jj_rescan) trace_return("expression(LOOKAHEAD FAILED)"); return true; }
-    { if (!jj_rescan) trace_return("expression(LOOKAHEAD SUCCEEDED)"); return false; }
+  private boolean jj_3R_23() {
+    if (!jj_rescan) trace_call("openpToken(LOOKING AHEAD...)");
+    if (jj_scan_token(OPENP)) { if (!jj_rescan) trace_return("openpToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("openpToken(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
-  private boolean jj_3R_5() {
-    if (!jj_rescan) trace_call("mn(LOOKING AHEAD...)");
+  private boolean jj_3R_20() {
+    if (!jj_rescan) trace_call("stringConstToken(LOOKING AHEAD...)");
+    if (jj_scan_token(STRING_CONST)) { if (!jj_rescan) trace_return("stringConstToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("stringConstToken(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_1()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_13() {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_8() {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    if (!jj_rescan) trace_call("lvalue(LOOKING AHEAD...)");
+    if (jj_3R_24()) { if (!jj_rescan) trace_return("lvalue(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("lvalue(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_19() {
+    if (!jj_rescan) trace_call("floatConstToken(LOOKING AHEAD...)");
+    if (jj_scan_token(FLOAT_CONST)) { if (!jj_rescan) trace_return("floatConstToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("floatConstToken(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_2() {
+    if (!jj_rescan) trace_call("numexpression(LOOKING AHEAD...)");
+    if (jj_3R_3()) { if (!jj_rescan) trace_return("numexpression(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("numexpression(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_18() {
+    if (!jj_rescan) trace_call("intConstToken(LOOKING AHEAD...)");
+    if (jj_scan_token(INT_CONST)) { if (!jj_rescan) trace_return("intConstToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("intConstToken(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_24() {
+    if (!jj_rescan) trace_call("idToken(LOOKING AHEAD...)");
+    if (jj_scan_token(ID)) { if (!jj_rescan) trace_return("idToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("idToken(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_6() {
+    if (!jj_rescan) trace_call("factor(LOOKING AHEAD...)");
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(18)) {
+    if (jj_3R_10()) {
     jj_scanpos = xsp;
-    if (jj_scan_token(19)) {
+    if (jj_3R_11()) {
     jj_scanpos = xsp;
-    if (jj_3R_7()) { if (!jj_rescan) trace_return("mn(LOOKAHEAD FAILED)"); return true; }
+    if (jj_3R_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_13()) {
+    jj_scanpos = xsp;
+    if (jj_3R_14()) {
+    jj_scanpos = xsp;
+    if (jj_3R_15()) { if (!jj_rescan) trace_return("factor(LOOKAHEAD FAILED)"); return true; }
     }
     }
-    { if (!jj_rescan) trace_return("mn(LOOKAHEAD SUCCEEDED)"); return false; }
+    }
+    }
+    }
+    { if (!jj_rescan) trace_return("factor(LOOKAHEAD SUCCEEDED)"); return false; }
+  }
+
+  private boolean jj_3R_10() {
+    if (jj_3R_18()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_17() {
+    if (!jj_rescan) trace_call("minusToken(LOOKING AHEAD...)");
+    if (jj_scan_token(MINUS)) { if (!jj_rescan) trace_return("minusToken(LOOKAHEAD FAILED)"); return true; }
+    { if (!jj_rescan) trace_return("minusToken(LOOKAHEAD SUCCEEDED)"); return false; }
   }
 
   /** Generated Token Manager. */

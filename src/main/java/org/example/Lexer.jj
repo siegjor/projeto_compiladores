@@ -1,3 +1,5 @@
+
+
 options {
     STATIC = false;
     DEBUG_LOOKAHEAD = true;
@@ -11,25 +13,67 @@ import java.util.Map;
 
 class MyParser {
     private static Map<String, ArrayList<String>> symbolTable;
+    private static ArrayList<String> tokenList;
+    private static StringBuilder sententialForm = new StringBuilder();
 
   public static void main( String[] args ) throws ParseException, TokenMgrError {
         boolean debug = true;
+        boolean hasLexicalError = false;
+        boolean hasSyntaxError = false;
         MyParser parser = new MyParser( System.in ) ;
         symbolTable = new HashMap<String, ArrayList<String>>();
+        tokenList = new ArrayList<String>();
+
         if (!debug) parser.disable_tracing();
+
+        boolean emptyInput = false;
         try {
             parser.program();
-        } catch(ParseException e) {
-            System.err.println(e.getMessage());
+        } catch (ParseException e) {
+            hasSyntaxError = true;
+            if (parser.token == null) {
+                emptyInput = true;
+            } else {
+                System.out.println("\nErro de análise sintática: " + e.getMessage());
+                System.out.println("Falha na linha: " + e.currentToken.beginLine + ", coluna: " + e.currentToken.beginColumn);
+                System.out.println("Forma sentencial alfa: " + sententialForm.toString());
+                System.out.println("Símbolo não-terminal mais à esquerda de alfa: " + e.currentToken.next.image);
+                System.out.println("Token da entrada que causou o erro: " + e.currentToken.image + "\n");
+            }
+        } catch (TokenMgrError e) {
+            hasLexicalError = true;
+            System.out.println("\nErro de análise léxica: " + e.getMessage());
         }
 
-        for (ArrayList<String> list : symbolTable.values()) {
-
-            System.out.println("nome: " + list.get(0));
-//            System.out.println("tipo: " + list.get(1));
-            System.out.println("ocorrencias: " + list.get(1));
-            System.out.println();
+        if (emptyInput) {
+            System.out.println("Erro de análise sintática: entrada vazia na tabela de reconhecimento");
         }
+
+        if (!hasLexicalError) {
+            System.out.println("\n>> Successo! Sem erros léxicos.");
+            System.out.println("Lista de tokens:");
+            System.out.println(tokenList);
+
+            System.out.println("\nTabela de símbolos:");
+            for (ArrayList<String> list : symbolTable.values()) {
+                System.out.println("Símbolo: '" + list.get(0) + "', " + list.get(1) + " ocorrências");
+            }
+            System.out.println("\n" + tokenList);
+        }
+
+        if (!hasSyntaxError) {
+            System.out.println("\n>> Successo! Sem erros sintáticos.");
+        }
+    }
+
+    private static void addTokenToList(String tokenName) {
+        if (!tokenList.contains(tokenName)) {
+            tokenList.add(tokenName);
+        }
+    }
+
+    private static void addToSententialForm(String symbol) {
+        sententialForm.append(symbol).append(" ");
     }
 }
 
@@ -91,10 +135,11 @@ TOKEN :
 | < STRING_CONST: "\"" (~["\""])* "\"" >
 }
 
-void id(String type):
+void idToken(String type):
 {Token t;}
 {
     t=<ID> {
+    tokenList.add("ID");
     if (symbolTable.containsKey(t.image)) {
         Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
         symbolCount++;
@@ -112,202 +157,421 @@ void id(String type):
 void program():
 {}
 {
-    funclist() | statement() | {} {}<EOF>
+    {addToSententialForm("program");}
+    funclist() | statement() | {}<EOF>
 }
 
 void funclist():
 {}
 {
+    {addToSententialForm("funclist");}
     funcdef() funclist2()
 }
 
 void funclist2():
 {}
 {
+    {addToSententialForm("funclist2");}
     funclist() | {}
 }
 
 void funcdef():
 {}
 {
-    <DEF> id("function") <OPENP> paramlist() <CLOSEP> <OPENCB> statelist() <CLOSECB>
+    {addToSententialForm("funcdef");}
+    defToken() idToken("function") <OPENP> paramlist() <CLOSEP> <OPENCB> statelist() <CLOSECB>
 }
 
 void paramlist():
 {}
 {
-    (<INT> | <FLOAT> | <STRING> ) id("parameter") <COMMA> paramlist2() | {}
+    {addToSententialForm("paramlist");}
+    (intToken() | floatToken() | stringToken() ) idToken("parameter") commaToken() paramlist2() | {}
 }
 
 void paramlist2():
 {}
 {
-    <COMMA> paramlist() | {}
+    {addToSententialForm("paramlist2");}
+    commaToken() paramlist() | {}
 }
 
 void statement():
 {}
 {
-    vardecl() <SEMIC> | atribstat() <SEMIC> | printstat() <SEMIC> | readstat() <SEMIC> | returnstat() <SEMIC> | ifstat() | forstat() | <OPENCB> statelist() <CLOSECB> | <BREAK> <SEMIC> | <SEMIC>
+    {addToSententialForm("statement");}
+    vardecl() semicToken() | atribstat() semicToken() | printstat() semicToken() | readstat() semicToken() | returnstat() semicToken() | ifstat() | forstat() | opencbToken() statelist() closecbToken() | breakToken() semicToken() | semicToken()
 }
 
 void vardecl():
 {}
 {
-    ( <INT> | <FLOAT> | <STRING>) id("variable") ic()
+    {addToSententialForm("vardecl");}
+    ( intToken() | floatToken() | stringToken()) idToken("variable") ic()
 }
 
 void ic():
 {}
 {
-    <OPENB> <INT_CONST> <CLOSEB> ic() | {}
+    {addToSententialForm("ic");}
+    openbToken() intConstToken() closebToken() ic() | {}
 }
 
 void atribstat():
 {}
 {
-    lvalue() <ASSIGN> (LOOKAHEAD(2) expression() | allocexpression() | funccal())
+    {addToSententialForm("atribstat");}
+    lvalue() assignToken() (LOOKAHEAD(2) expression() | allocexpression() | funccal())
 }
 
 void funccal():
 {}
 {
-    id("function") <OPENP> paramlistcall() <CLOSEP>
+    {addToSententialForm("funccal");}
+    idToken("function") openpToken() paramlistcall() closepToken()
 }
 
 void paramlistcall():
 {}
 {
-    id("parameter") paramlistcall2() | {}
+    {addToSententialForm("paramlistcall");}
+    idToken("parameter") paramlistcall2() | {}
 }
 
 void paramlistcall2():
 {}
 {
-    <COMMA> paramlistcall() | {}
+    {addToSententialForm("paramlistcall2");}
+    commaToken() paramlistcall() | {}
 }
 
 void printstat():
 {}
 {
-    <PRINT> expression()
+    {addToSententialForm("printstat");}
+    printToken() expression()
 }
 void readstat():
 {}
 {
-    <READ> lvalue()
+    {addToSententialForm("readstat");}
+    readToken() lvalue()
 }
 
 void returnstat():
 {}
 {
-    <RETURN>
+    {addToSententialForm("returnstat");}
+    returnToken()
 }
 
 void ifstat():
 {}
 {
-    <IF> <OPENP> expression() <CLOSEP> statement() es()
+    {addToSententialForm("ifstat");}
+    ifToken() openpToken() expression() closepToken() statement() es()
 }
 
 void es():
 {}
 {
-    <ELSE> statement() | {}
+    {addToSententialForm("es");}
+    elseToken() statement() | {}
 }
 
 void forstat():
 {}
 {
-    <FOR> <OPENP> atribstat()<SEMIC> expression() <SEMIC> atribstat() <CLOSEP> statement()
+    {addToSententialForm("forstat");}
+    forToken() openpToken() atribstat() semicToken() expression() semicToken() atribstat() closepToken() statement()
 }
 
 void statelist():
 {}
 {
+    {addToSententialForm("statelist");}
     statement() sl()
 }
 
 void sl():
 {}
 {
+    {addToSententialForm("sl");}
     statelist() | {}
 }
 
 void allocexpression():
 {}
 {
-    <NEW> (<INT> | <FLOAT> | <STRING>) ne()
+    {addToSententialForm("allocexpression");}
+    newToken() (intToken() | floatToken() | stringToken()) ne()
 }
 
 void ne():
 {}
 {
-    <OPENB> numexpression() <CLOSEB> (ne() | {})
+    {addToSententialForm("ne");}
+    openbToken() numexpression() closebToken() (ne() | {})
 }
 
 void expression():
 {}
 {
+    {addToSententialForm("numexpression");}
     numexpression() ned()
 }
 
 void ned():
 {}
 {
-    (<LESS> | <GREAT> | <LESSEQ> | <GREATEQ> | <EQUALS> | <DIFF> ) numexpression() | {}
+    {addToSententialForm("ned");}
+    (lessToken() | greatToken() | lesseqToken() | greateqToken() | equalsToken() | diffToken() ) numexpression() | {}
 }
 
 void numexpression():
 {}
 {
+    {addToSententialForm("numexpression");}
     term() ner()
 }
 
 void ner():
 {}
 {
-    (<PLUS> | <MINUS> ) term() ner() | {}
+    {addToSententialForm("ner");}
+    (plusToken() | minusToken() ) term() ner() | {}
 }
 
 void term():
 {}
 {
+    {addToSententialForm("term");}
     unaryexpr() ue()
 }
 
 void ue():
 {}
 {
-    (<MULT> | <DIV> | <MOD> ) unaryexpr() ue() | {}
+    {addToSententialForm("ue");}
+    (multToken() | divToken() | modToken() ) unaryexpr() ue() | {}
 }
 
 void unaryexpr():
 {}
 {
+    {addToSententialForm("unaryexpr");}
     mn() factor()
 }
 
 void mn():
 {}
 {
-    <PLUS> | <MINUS> | {}
+    {addToSententialForm("mn");}
+    plusToken() | minusToken() | {}
 }
 
 void factor():
 {}
 {
-    <INT_CONST> | <FLOAT_CONST> | <STRING_CONST> | <NULL> | lvalue() | <OPENP> numexpression() <CLOSEP>
+    {addToSententialForm("factor");}
+    intConstToken() | floatConstToken() | stringConstToken() | nullToken() | lvalue() | openpToken() numexpression() closepToken()
 }
 
 void lvalue():
 {}
 {
-   id("lvalue") net()
+    {addToSententialForm("lvalue");}
+   idToken("lvalue") net()
 }
 
 void net():
 {}
 {
-    <OPENB> numexpression() <CLOSEB> net() | {}
+    {addToSententialForm("net");}
+    openbToken() numexpression() closebToken() net() | {}
 }
+
+void intToken():
+{}
+{
+    <INT> {tokenList.add("INT");}
+}
+
+void floatToken():
+{}
+{
+    <FLOAT> {tokenList.add("FLOAT");}
+}
+void stringToken():
+{}
+{
+    <STRING> {tokenList.add("STRING");}
+}
+void defToken():
+{}
+{
+    <DEF> {tokenList.add("DEF");}
+}
+void breakToken():
+{}
+{
+    <BREAK> {tokenList.add("BREAK");}
+}
+void printToken():
+{}
+{
+    <PRINT> {tokenList.add("PRINT");}
+}
+void readToken():
+{}
+{
+    <READ> {tokenList.add("READ");}
+}
+void returnToken():
+{}
+{
+    <RETURN> {tokenList.add("RETURN");}
+}
+void newToken():
+{}
+{
+    <NEW> {tokenList.add("NEW");}
+}
+void nullToken():
+{}
+{
+    <NULL> {tokenList.add("NULL");}
+}
+void ifToken():
+{}
+{
+    <IF> {tokenList.add("IF");}
+}
+void elseToken():
+{}
+{
+    <ELSE> {tokenList.add("ELSE");}
+}
+void forToken():
+{}
+{
+    <FOR> {tokenList.add("FOR");}
+}
+void plusToken():
+{}
+{
+    <PLUS> {tokenList.add("PLUS");}
+}
+void minusToken():
+{}
+{
+    <MINUS> {tokenList.add("MINUS");}
+}
+void multToken():
+{}
+{
+    <MULT> {tokenList.add("MULT");}
+}
+void divToken():
+{}
+{
+    <DIV> {tokenList.add("DIV");}
+}
+void openpToken():
+{}
+{
+    <OPENP> {tokenList.add("OPENP");}
+}
+void closepToken():
+{}
+{
+    <CLOSEP> {tokenList.add("CLOSEP");}
+}
+void openbToken():
+{}
+{
+    <OPENB> {tokenList.add("OPENB");}
+}
+void closebToken():
+{}
+{
+    <CLOSEB> {tokenList.add("CLOSEB");}
+}
+void opencbToken():
+{}
+{
+    <OPENCB> {tokenList.add("OPENCB");}
+}
+void closecbToken():
+{}
+{
+    <CLOSECB> {tokenList.add("CLOSECB");}
+}
+void semicToken():
+{}
+{
+    <SEMIC> {tokenList.add("SEMIC");}
+}
+void commaToken():
+{}
+{
+    <COMMA> {tokenList.add("COMMA");}
+}
+void equalsToken():
+{}
+{
+    <EQUALS> {tokenList.add("EQUALS");}
+}
+void assignToken():
+{}
+{
+    <ASSIGN> {tokenList.add("ASSIGN");}
+}
+void greatToken():
+{}
+{
+    <GREAT> {tokenList.add("GREAT");}
+}
+void greateqToken():
+{}
+{
+    <GREATEQ> {tokenList.add("GREATEQ");}
+}
+void lessToken():
+{}
+{
+    <LESS> {tokenList.add("LESS");}
+}
+void lesseqToken():
+{}
+{
+    <LESSEQ> {tokenList.add("LESSEQ");}
+}
+void diffToken():
+{}
+{
+    <DIFF> {tokenList.add("DIFF");}
+}
+void modToken():
+{}
+{
+    <MOD> {tokenList.add("MOD");}
+}
+
+void intConstToken():
+ {}
+ {
+     <INT_CONST> {tokenList.add("INT_CONST");}
+ }
+
+ void floatConstToken():
+ {}
+ {
+     <FLOAT_CONST> {tokenList.add("FLOAT_CONST");}
+ }
+
+ void stringConstToken():
+ {}
+ {
+     <STRING_CONST> {tokenList.add("STRING_CONST");}
+ }
