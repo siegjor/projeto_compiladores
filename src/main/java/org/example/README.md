@@ -4,11 +4,12 @@
 * JavaCC (não é necessário, a menos que se queira gerar o parser novamente)
 
 ### Como executar o código
-1. (opcional) Rode ``make compile`` para gerar o parser e outros arquivos
+1. Abra a pasta *projeto_compiladores* em um terminal ou IDE
+2. (opcional) Rode ``make compile`` para gerar o parser e outros arquivos
    (requer JavaCC)
-2. Rode ``make build`` para compilar os arquivos .java
-3. Rode ``make run`` para executar o programa
-4. Se necessário, rode ``make clean`` para deletar os arquivos gerados
+3. Rode ``make build`` para compilar os arquivos .java
+4. Rode ``make run`` para executar o programa
+5. Se necessário, rode ``make clean`` para deletar os arquivos gerados
 
 **CUIDADO**: ``make clean`` irá deletar todos os arquivos gerados,
 até os gerados pelo JavaCC, ou seja, para gerá-los novamente,
