@@ -398,6 +398,7 @@ void idToken(String type):
 {Token t;}
 {
     t=<ID> {
+    addToSententialForm("ID");
     tokenList.add("ID");
     if (symbolTable.containsKey(t.image)) {
         Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
@@ -414,180 +415,217 @@ void idToken(String type):
 void intToken():
 {}
 {
-    <INT> {tokenList.add("INT");}
+    {addToSententialForm("ID");}
+    <INT> {tokenList.add("INT");
+}
 }
 void floatToken():
 {}
 {
+    {addToSententialForm("FLOAT");}
     <FLOAT> {tokenList.add("FLOAT");}
 }
 void stringToken():
 {}
 {
+    {addToSententialForm("STRING");}
     <STRING> {tokenList.add("STRING");}
 }
 void defToken():
 {}
 {
+    {addToSententialForm("DEF");}
     <DEF> {tokenList.add("DEF");}
 }
 void breakToken():
 {}
 {
+    {addToSententialForm("BREAK");}
     <BREAK> {tokenList.add("BREAK");}
 }
 void printToken():
 {}
 {
+    {addToSententialForm("PRINT");}
     <PRINT> {tokenList.add("PRINT");}
 }
 void readToken():
 {}
 {
+    {addToSententialForm("READ");}
     <READ> {tokenList.add("READ");}
 }
 void returnToken():
 {}
 {
+    {addToSententialForm("RETURN");}
     <RETURN> {tokenList.add("RETURN");}
 }
 void newToken():
 {}
 {
+    {addToSententialForm("NEW");}
     <NEW> {tokenList.add("NEW");}
 }
 void nullToken():
 {}
 {
+    {addToSententialForm("NULL");}
     <NULL> {tokenList.add("NULL");}
 }
 void ifToken():
 {}
 {
+    {addToSententialForm("IF");}
     <IF> {tokenList.add("IF");}
 }
 void elseToken():
 {}
 {
+    {addToSententialForm("ELSE");}
     <ELSE> {tokenList.add("ELSE");}
 }
 void forToken():
 {}
 {
+    {addToSententialForm("FOR");}
     <FOR> {tokenList.add("FOR");}
 }
 void plusToken():
 {}
 {
+    {addToSententialForm("PLUS");}
     <PLUS> {tokenList.add("PLUS");}
 }
 void minusToken():
 {}
 {
+    {addToSententialForm("MINUS");}
     <MINUS> {tokenList.add("MINUS");}
 }
 void multToken():
 {}
 {
+    {addToSententialForm("MULT");}
     <MULT> {tokenList.add("MULT");}
 }
 void divToken():
 {}
 {
+    {addToSententialForm("DIV");}
     <DIV> {tokenList.add("DIV");}
 }
 void openpToken():
 {}
 {
+    {addToSententialForm("OPENP");}
     <OPENP> {tokenList.add("OPENP");}
 }
 void closepToken():
 {}
 {
+    {addToSententialForm("CLOSEP");}
     <CLOSEP> {tokenList.add("CLOSEP");}
 }
 void openbToken():
 {}
 {
+    {addToSententialForm("OPENB");}
     <OPENB> {tokenList.add("OPENB");}
 }
 void closebToken():
 {}
 {
+    {addToSententialForm("CLOSEB");}
     <CLOSEB> {tokenList.add("CLOSEB");}
 }
 void opencbToken():
 {}
 {
+    {addToSententialForm("OPENCB");}
     <OPENCB> {tokenList.add("OPENCB");}
 }
 void closecbToken():
 {}
 {
+    {addToSententialForm("CLOSECB");}
     <CLOSECB> {tokenList.add("CLOSECB");}
 }
 void semicToken():
 {}
 {
+    {addToSententialForm("SEMIC");}
     <SEMIC> {tokenList.add("SEMIC");}
 }
 void commaToken():
 {}
 {
+    {addToSententialForm("COMMA");}
     <COMMA> {tokenList.add("COMMA");}
 }
 void equalsToken():
 {}
 {
+    {addToSententialForm("EQUALS");}
     <EQUALS> {tokenList.add("EQUALS");}
 }
 void assignToken():
 {}
 {
+    {addToSententialForm("ASSIGN");}
     <ASSIGN> {tokenList.add("ASSIGN");}
 }
 void greatToken():
 {}
 {
+    {addToSententialForm("GREAT");}
     <GREAT> {tokenList.add("GREAT");}
 }
 void greateqToken():
 {}
 {
+    {addToSententialForm("GREATEQ");}
     <GREATEQ> {tokenList.add("GREATEQ");}
 }
 void lessToken():
 {}
 {
+    {addToSententialForm("LESS");}
     <LESS> {tokenList.add("LESS");}
 }
 void lesseqToken():
 {}
 {
+    {addToSententialForm("LESSEQ");}
     <LESSEQ> {tokenList.add("LESSEQ");}
 }
 void diffToken():
 {}
 {
+    {addToSententialForm("DIFF");}
     <DIFF> {tokenList.add("DIFF");}
 }
 void modToken():
 {}
 {
+    {addToSententialForm("MOD");}
     <MOD> {tokenList.add("MOD");}
 }
 void intConstToken():
  {}
  {
+    {addToSententialForm("INT_CONST");}
      <INT_CONST> {tokenList.add("INT_CONST");}
  }
 void floatConstToken():
  {}
  {
+    {addToSententialForm("FLOAT_CONST");}
      <FLOAT_CONST> {tokenList.add("FLOAT_CONST");}
  }
 void stringConstToken():
  {}
  {
+    {addToSententialForm("STRING_CONST");}
      <STRING_CONST> {tokenList.add("STRING_CONST");}
  }
