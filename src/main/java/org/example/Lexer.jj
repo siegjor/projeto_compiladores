@@ -9,13 +9,15 @@ options {
 }
 
 PARSER_BEGIN(MyParser)
-import java.util.ArrayList;import java.util.HashMap;
+import org.example.CustomTreeNode;import java.util.ArrayList;import java.util.HashMap;
 import java.util.Map;
 
 class MyParser {
     private static Map<String, ArrayList<String>> symbolTable;
     private static ArrayList<String> tokenList;
     private static StringBuilder sententialForm = new StringBuilder();
+    private static ArrayList<HashMap<String, Boolean>> sententialFormList;
+    private static ArrayList<HashMap<String, Boolean>> removedTokens;
 
   public static void main( String[] args ) throws ParseException, TokenMgrError {
         // Habilite essa opção para gerar o log da árvore sintática
@@ -28,6 +30,9 @@ class MyParser {
         MyParser parser = new MyParser( System.in ) ;
         symbolTable = new HashMap<String, ArrayList<String>>();
         tokenList = new ArrayList<String>();
+        sententialFormList = new ArrayList<HashMap<String, Boolean>>();
+        removedTokens = new ArrayList<HashMap<String, Boolean>>();
+        CustomTreeNode treeNode = new CustomTreeNode();
 
         if (!debug) parser.disable_tracing();
 
@@ -49,6 +54,9 @@ class MyParser {
             if (parser.token == null) {
                 emptyInput = true;
             } else {
+
+                    System.out.println("AAAAAAAAAAAAAAAAAAA" + treeNode.getCount());
+
                 System.out.println("\nErro de análise sintática: " + e.getMessage());
                 System.out.println("Falha na linha: " + e.currentToken.beginLine + ", coluna: " + e.currentToken.beginColumn);
                 System.out.println("Forma sentencial alfa: " + sententialForm.toString());
@@ -87,8 +95,18 @@ class MyParser {
         }
     }
 
-    private static void addToSententialForm(String symbol) {
-        sententialForm.append(symbol).append(" ");
+    private static void addToSententialForm(String symbol, boolean terminal) {
+       if (!sententialFormList.isEmpty()) {
+           HashMap<String, Boolean> lastAddedToken = sententialFormList.get(sententialFormList.size() - 1);
+           for (boolean isTerminal : lastAddedToken.values()) {
+               if (!isTerminal) {
+                   sententialFormList.remove(lastAddedToken);
+                   removedTokens.add(lastAddedToken);
+               }
+           }
+       }
+       HashMap<String, Boolean> symbolMap = new HashMap<String, Boolean>();
+       symbolMap.put(symbol, terminal);
     }
 }
 
@@ -155,238 +173,238 @@ TOKEN :
 void program():
 {}
 {
-    {addToSententialForm("program");}
+    {addToSententialForm("program", false);}
     funclist() | statement() | {}<EOF>
 }
 
 void funclist():
 {}
 {
-    {addToSententialForm("funclist");}
+    {addToSententialForm("funclist", false);}
     funcdef() funclist2()
 }
 
 void funclist2():
 {}
 {
-    {addToSententialForm("funclist2");}
+    {addToSententialForm("funclist2", false);}
     funclist() | {}
 }
 
 void funcdef():
 {}
 {
-    {addToSententialForm("funcdef");}
+    {addToSententialForm("funcdef", false);}
     defToken() idToken("function") openpToken() paramlist() closepToken() opencbToken() statelist() closecbToken()
 }
 
 void paramlist():
 {}
 {
-    {addToSententialForm("paramlist");}
+    {addToSententialForm("paramlist", false);}
     (intToken() | floatToken() | stringToken() ) idToken("parameter") commaToken() paramlist2() | {}
 }
 
 void paramlist2():
 {}
 {
-    {addToSententialForm("paramlist2");}
+    {addToSententialForm("paramlist2", false);}
     commaToken() paramlist() | {}
 }
 
 void statement():
 {}
 {
-    {addToSententialForm("statement");}
+    {addToSententialForm("statement", false);}
     vardecl() semicToken() | atribstat() semicToken() | printstat() semicToken() | readstat() semicToken() | returnstat() semicToken() | ifstat() | forstat() | opencbToken() statelist() closecbToken() | breakToken() semicToken() | semicToken()
 }
 
 void vardecl():
 {}
 {
-    {addToSententialForm("vardecl");}
+    {addToSententialForm("vardecl", false);}
     ( intToken() | floatToken() | stringToken()) idToken("variable") ic()
 }
 
 void ic():
 {}
 {
-    {addToSententialForm("ic");}
+    {addToSententialForm("ic", false);}
     openbToken() intConstToken() closebToken() ic() | {}
 }
 
 void atribstat():
 {}
 {
-    {addToSententialForm("atribstat");}
+    {addToSententialForm("atribstat", false);}
     lvalue() assignToken() (LOOKAHEAD(2) expression() | allocexpression() | funccal())
 }
 
 void funccal():
 {}
 {
-    {addToSententialForm("funccal");}
+    {addToSententialForm("funccal", false);}
     idToken("function") openpToken() paramlistcall() closepToken()
 }
 
 void paramlistcall():
 {}
 {
-    {addToSententialForm("paramlistcall");}
+    {addToSententialForm("paramlistcall", false);}
     idToken("parameter") paramlistcall2() | {}
 }
 
 void paramlistcall2():
 {}
 {
-    {addToSententialForm("paramlistcall2");}
+    {addToSententialForm("paramlistcall2", false);}
     commaToken() paramlistcall() | {}
 }
 
 void printstat():
 {}
 {
-    {addToSententialForm("printstat");}
+    {addToSententialForm("printstat", false);}
     printToken() expression()
 }
 
 void readstat():
 {}
 {
-    {addToSententialForm("readstat");}
+    {addToSententialForm("readstat", false);}
     readToken() lvalue()
 }
 
 void returnstat():
 {}
 {
-    {addToSententialForm("returnstat");}
+    {addToSententialForm("returnstat", false);}
     returnToken()
 }
 
 void ifstat():
 {}
 {
-    {addToSententialForm("ifstat");}
+    {addToSententialForm("ifstat", false);}
     ifToken() openpToken() expression() closepToken() statement() es()
 }
 
 void es():
 {}
 {
-    {addToSententialForm("es");}
+    {addToSententialForm("es", false);}
     elseToken() statement() | {}
 }
 
 void forstat():
 {}
 {
-    {addToSententialForm("forstat");}
+    {addToSententialForm("forstat", false);}
     forToken() openpToken() atribstat() semicToken() expression() semicToken() atribstat() closepToken() statement()
 }
 
 void statelist():
 {}
 {
-    {addToSententialForm("statelist");}
+    {addToSententialForm("statelist", false);}
     statement() sl()
 }
 
 void sl():
 {}
 {
-    {addToSententialForm("sl");}
+    {addToSententialForm("sl", false);}
     statelist() | {}
 }
 
 void allocexpression():
 {}
 {
-    {addToSententialForm("allocexpression");}
+    {addToSententialForm("allocexpression", false);}
     newToken() (intToken() | floatToken() | stringToken()) ne()
 }
 
 void ne():
 {}
 {
-    {addToSententialForm("ne");}
+    {addToSententialForm("ne", false);}
     openbToken() numexpression() closebToken() (ne() | {})
 }
 
 void expression():
 {}
 {
-    {addToSententialForm("numexpression");}
+    {addToSententialForm("numexpression", false);}
     numexpression() ned()
 }
 
 void ned():
 {}
 {
-    {addToSententialForm("ned");}
+    {addToSententialForm("ned", false);}
     (lessToken() | greatToken() | lesseqToken() | greateqToken() | equalsToken() | diffToken() ) numexpression() | {}
 }
 
 void numexpression():
 {}
 {
-    {addToSententialForm("numexpression");}
+    {addToSententialForm("numexpression", false);}
     term() ner()
 }
 
 void ner():
 {}
 {
-    {addToSententialForm("ner");}
+    {addToSententialForm("ner", false);}
     (plusToken() | minusToken() ) term() ner() | {}
 }
 
 void term():
 {}
 {
-    {addToSententialForm("term");}
+    {addToSententialForm("term", false);}
     unaryexpr() ue()
 }
 
 void ue():
 {}
 {
-    {addToSententialForm("ue");}
+    {addToSententialForm("ue", false);}
     (multToken() | divToken() | modToken() ) unaryexpr() ue() | {}
 }
 
 void unaryexpr():
 {}
 {
-    {addToSententialForm("unaryexpr");}
+    {addToSententialForm("unaryexpr", false);}
     mn() factor()
 }
 
 void mn():
 {}
 {
-    {addToSententialForm("mn");}
+    {addToSententialForm("mn", false);}
     plusToken() | minusToken() | {}
 }
 
 void factor():
 {}
 {
-    {addToSententialForm("factor");}
+    {addToSententialForm("factor", false);}
     intConstToken() | floatConstToken() | stringConstToken() | nullToken() | lvalue() | openpToken() numexpression() closepToken()
 }
 
 void lvalue():
 {}
 {
-    {addToSententialForm("lvalue");}
+    {addToSententialForm("lvalue", false);}
    idToken("lvalue") net()
 }
 
 void net():
 {}
 {
-    {addToSententialForm("net");}
+    {addToSententialForm("net", false);}
     openbToken() numexpression() closebToken() net() | {}
 }
 
@@ -398,8 +416,9 @@ void idToken(String type):
 {Token t;}
 {
     t=<ID> {
-    addToSententialForm("ID");
+    addToSententialForm("ID", true);
     tokenList.add("ID");
+
     if (symbolTable.containsKey(t.image)) {
         Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
         symbolCount++;
@@ -415,217 +434,217 @@ void idToken(String type):
 void intToken():
 {}
 {
-    {addToSententialForm("ID");}
+    {addToSententialForm("ID", true);}
     <INT> {tokenList.add("INT");
 }
 }
 void floatToken():
 {}
 {
-    {addToSententialForm("FLOAT");}
+    {addToSententialForm("FLOAT", true);}
     <FLOAT> {tokenList.add("FLOAT");}
 }
 void stringToken():
 {}
 {
-    {addToSententialForm("STRING");}
+    {addToSententialForm("STRING", true);}
     <STRING> {tokenList.add("STRING");}
 }
 void defToken():
 {}
 {
-    {addToSententialForm("DEF");}
+    {addToSententialForm("DEF", true);}
     <DEF> {tokenList.add("DEF");}
 }
 void breakToken():
 {}
 {
-    {addToSententialForm("BREAK");}
+    {addToSententialForm("BREAK", true);}
     <BREAK> {tokenList.add("BREAK");}
 }
 void printToken():
 {}
 {
-    {addToSententialForm("PRINT");}
+    {addToSententialForm("PRINT", true);}
     <PRINT> {tokenList.add("PRINT");}
 }
 void readToken():
 {}
 {
-    {addToSententialForm("READ");}
+    {addToSententialForm("READ", true);}
     <READ> {tokenList.add("READ");}
 }
 void returnToken():
 {}
 {
-    {addToSententialForm("RETURN");}
+    {addToSententialForm("RETURN", true);}
     <RETURN> {tokenList.add("RETURN");}
 }
 void newToken():
 {}
 {
-    {addToSententialForm("NEW");}
+    {addToSententialForm("NEW", true);}
     <NEW> {tokenList.add("NEW");}
 }
 void nullToken():
 {}
 {
-    {addToSententialForm("NULL");}
+    {addToSententialForm("NULL", true);}
     <NULL> {tokenList.add("NULL");}
 }
 void ifToken():
 {}
 {
-    {addToSententialForm("IF");}
+    {addToSententialForm("IF", true);}
     <IF> {tokenList.add("IF");}
 }
 void elseToken():
 {}
 {
-    {addToSententialForm("ELSE");}
+    {addToSententialForm("ELSE", true);}
     <ELSE> {tokenList.add("ELSE");}
 }
 void forToken():
 {}
 {
-    {addToSententialForm("FOR");}
+    {addToSententialForm("FOR", true);}
     <FOR> {tokenList.add("FOR");}
 }
 void plusToken():
 {}
 {
-    {addToSententialForm("PLUS");}
+    {addToSententialForm("PLUS", true);}
     <PLUS> {tokenList.add("PLUS");}
 }
 void minusToken():
 {}
 {
-    {addToSententialForm("MINUS");}
+    {addToSententialForm("MINUS", true);}
     <MINUS> {tokenList.add("MINUS");}
 }
 void multToken():
 {}
 {
-    {addToSententialForm("MULT");}
+    {addToSententialForm("MULT", true);}
     <MULT> {tokenList.add("MULT");}
 }
 void divToken():
 {}
 {
-    {addToSententialForm("DIV");}
+    {addToSententialForm("DIV", true);}
     <DIV> {tokenList.add("DIV");}
 }
 void openpToken():
 {}
 {
-    {addToSententialForm("OPENP");}
+    {addToSententialForm("OPENP", true);}
     <OPENP> {tokenList.add("OPENP");}
 }
 void closepToken():
 {}
 {
-    {addToSententialForm("CLOSEP");}
+    {addToSententialForm("CLOSEP", true);}
     <CLOSEP> {tokenList.add("CLOSEP");}
 }
 void openbToken():
 {}
 {
-    {addToSententialForm("OPENB");}
+    {addToSententialForm("OPENB", true);}
     <OPENB> {tokenList.add("OPENB");}
 }
 void closebToken():
 {}
 {
-    {addToSententialForm("CLOSEB");}
+    {addToSententialForm("CLOSEB", true);}
     <CLOSEB> {tokenList.add("CLOSEB");}
 }
 void opencbToken():
 {}
 {
-    {addToSententialForm("OPENCB");}
+    {addToSententialForm("OPENCB", true);}
     <OPENCB> {tokenList.add("OPENCB");}
 }
 void closecbToken():
 {}
 {
-    {addToSententialForm("CLOSECB");}
+    {addToSententialForm("CLOSECB", true);}
     <CLOSECB> {tokenList.add("CLOSECB");}
 }
 void semicToken():
 {}
 {
-    {addToSententialForm("SEMIC");}
+    {addToSententialForm("SEMIC", true);}
     <SEMIC> {tokenList.add("SEMIC");}
 }
 void commaToken():
 {}
 {
-    {addToSententialForm("COMMA");}
+    {addToSententialForm("COMMA", true);}
     <COMMA> {tokenList.add("COMMA");}
 }
 void equalsToken():
 {}
 {
-    {addToSententialForm("EQUALS");}
+    {addToSententialForm("EQUALS", true);}
     <EQUALS> {tokenList.add("EQUALS");}
 }
 void assignToken():
 {}
 {
-    {addToSententialForm("ASSIGN");}
+    {addToSententialForm("ASSIGN", true);}
     <ASSIGN> {tokenList.add("ASSIGN");}
 }
 void greatToken():
 {}
 {
-    {addToSententialForm("GREAT");}
+    {addToSententialForm("GREAT", true);}
     <GREAT> {tokenList.add("GREAT");}
 }
 void greateqToken():
 {}
 {
-    {addToSententialForm("GREATEQ");}
+    {addToSententialForm("GREATEQ", true);}
     <GREATEQ> {tokenList.add("GREATEQ");}
 }
 void lessToken():
 {}
 {
-    {addToSententialForm("LESS");}
+    {addToSententialForm("LESS", true);}
     <LESS> {tokenList.add("LESS");}
 }
 void lesseqToken():
 {}
 {
-    {addToSententialForm("LESSEQ");}
+    {addToSententialForm("LESSEQ", true);}
     <LESSEQ> {tokenList.add("LESSEQ");}
 }
 void diffToken():
 {}
 {
-    {addToSententialForm("DIFF");}
+    {addToSententialForm("DIFF", true);}
     <DIFF> {tokenList.add("DIFF");}
 }
 void modToken():
 {}
 {
-    {addToSententialForm("MOD");}
+    {addToSententialForm("MOD", true);}
     <MOD> {tokenList.add("MOD");}
 }
 void intConstToken():
  {}
  {
-    {addToSententialForm("INT_CONST");}
+    {addToSententialForm("INT_CONST", true);}
      <INT_CONST> {tokenList.add("INT_CONST");}
  }
 void floatConstToken():
  {}
  {
-    {addToSententialForm("FLOAT_CONST");}
+    {addToSententialForm("FLOAT_CONST", true);}
      <FLOAT_CONST> {tokenList.add("FLOAT_CONST");}
  }
 void stringConstToken():
  {}
  {
-    {addToSententialForm("STRING_CONST");}
+    {addToSententialForm("STRING_CONST", true);}
      <STRING_CONST> {tokenList.add("STRING_CONST");}
  }

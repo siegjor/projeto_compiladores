@@ -1,3 +1,6 @@
+
+# Makefile
+
 # Variáveis
 JAVACC := javacc
 JAVAC := javac
@@ -8,12 +11,6 @@ GRAMMAR := Lexer.jj
 SOURCE := MyParser.java
 PROGRAM1 := ex.lcc
 
-# Diretório para armazenar os arquivos compilados (.class)
-CLASSES_DIR := classes
-
-# Lista de arquivos .java a serem excluídos durante a limpeza (exceto CustomTreeNode.java)
-JAVA_FILES := $(filter-out CustomTreeNode.java,$(wildcard *.java))
-
 # Builda o target
 all: compile build run
 
@@ -23,21 +20,20 @@ compile:
 
 # Compila os arquivos Java
 build:
-	$(JAVAC) -d $(CLASSES_DIR) *.$(JAVA)
+	$(JAVAC) *.$(JAVA)
 
 # Roda o programa
 # Para ler outras entradas, mude PROGRAM1 para PROGRAM2 ou PROGRAM3
 run:
-	$(JAVA) -cp $(CLASSES_DIR) MyParser < $(PROGRAM1)
+	$(JAVA) -cp .:classes MyParser < $(PROGRAM1)
+#$(JAVA) MyParser < $(PROGRAM1)
 
 # Deleta os arquivos gerados
 clean:
 ifeq ($(OS),Windows_NT)
-	@if exist $(CLASSES_DIR) ( rd /s /q $(CLASSES_DIR) )
-	@for %%f in ($(JAVA_FILES)) do del "%%f"
+	del /Q *.java *.class
 else
-	rm -rf $(CLASSES_DIR)
-	rm -f $(JAVA_FILES)
+	rm -f *.java *.class
 endif
 
 # Phony targets
