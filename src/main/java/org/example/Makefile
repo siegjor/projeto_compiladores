@@ -11,8 +11,8 @@ PROGRAM1 := ex.lcc
 # Diretório para armazenar os arquivos compilados (.class)
 CLASSES_DIR := classes
 
-# Lista de arquivos .java a serem excluídos durante a limpeza (exceto CustomTreeNode.java)
-JAVA_FILES := $(filter-out CustomTreeNode.java,$(wildcard *.java))
+# Lista de arquivos .java a serem excluídos durante a limpeza (exceto CustomNode.java)
+JAVA_FILES := $(filter-out CustomNode.java CustomTree.java,$(wildcard *.java))
 
 # Builda o target
 all: compile build run

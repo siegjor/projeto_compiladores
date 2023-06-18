@@ -9,7 +9,7 @@
   for (i = 1; i <= max; i = i + 1){
     print x;
     x = x + 0.001;
-    z = x +;
+    z = x + 2;
     if (z != x){
       print "Erro numérico na atribuição de números na notação ponto flutuante!";
       break;
