@@ -387,7 +387,6 @@ void idToken(String type):
 {
     t=<ID> {
     customTree.addTokenToList("ID", true, t.image);
-
     if (symbolTable.containsKey(t.image)) {
         Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
         symbolCount++;

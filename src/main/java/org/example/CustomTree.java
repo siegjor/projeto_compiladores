@@ -29,7 +29,7 @@ public class CustomTree {
     }
 
     public String getSententialForm() {
-        ArrayList<String> leafStringList = getTerminals().stream().map(CustomNode::getValue).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<String> leafStringList = getTerminals().stream().map(CustomNode::getName).collect(Collectors.toCollection(ArrayList::new));
         return String.join(", ", leafStringList);
     }
 
