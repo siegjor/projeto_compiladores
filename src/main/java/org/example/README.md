@@ -12,7 +12,8 @@
 4. Rode ``make run`` para executar o programa
 5. Se necessário, rode ``make clean`` para deletar os arquivos gerados
 
-**CUIDADO**: ``make clean`` irá deletar todos os arquivos .java e .class gerados (exceto os arquivos "Custom..."), ou seja, para gerá-los novamente,
+**CUIDADO**: ``make clean`` irá deletar todos os arquivos .java e .class gerados (exceto os arquivos CustomNode.java
+e CustomTree.java, pois eles foram criados por nós), ou seja, para gerá-los novamente,
 é necessário ter o JavaCC instalado!
 
 **OBS:** Rodando ``make all`` irá executar os comandos *compile*,
@@ -24,7 +25,7 @@ No arquivo *Makefile* há três variáveis diferentes, **PROGRAM1**,
 diferente.
 
 Para escolher qual programa rodar, basta substituir na
-linha 34 do Makefile o **PROGRAM1** pela variável contendo o programa desejado.
+linha 33 do Makefile o **PROGRAM1** pela variável contendo o programa desejado.
 
 ### Observação
 Ao executar o comando ``make build``, irá aparecer dois warnings no terminal. Estes warnings estão
