@@ -9,7 +9,6 @@ SOURCE := MyParser.java
 PROGRAM1 := program_1.lcc
 PROGRAM2 := program_2.lcc
 PROGRAM3 := program_3.lcc
-EXAMPLE := ex.lcc
 
 # Diretório para armazenar os arquivos compilados (.class)
 CLASSES_DIR := classes

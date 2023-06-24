@@ -3,9 +3,9 @@ package org.example;
 import java.util.HashSet;
 
 public class CustomNode {
-    private String name;
+    private final String name;
     private String value;
-    private boolean terminal;
+    private final boolean terminal;
     private int count = 1;
     private HashSet<String> types;
 

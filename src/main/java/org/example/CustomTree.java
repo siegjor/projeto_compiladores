@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class CustomTree {
-    private ArrayList<CustomNode> tokenList;
-    private HashMap<String, CustomNode> symbolTable;
+    private final ArrayList<CustomNode> tokenList;
+    private final HashMap<String, CustomNode> symbolTable;
 
     public CustomTree() {
         this.tokenList = new ArrayList<>();
@@ -63,7 +63,6 @@ public class CustomTree {
                 break;
             }
         }
-
 
         return String.join(", ", leafStringList);
     }

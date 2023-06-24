@@ -48,7 +48,7 @@ class MyParser {
             System.out.println("\nErro de análise sintática: " + e.getMessage());
             System.out.println("Forma sentencial alfa: " + customTree.getSententialForm());
             System.out.println("Símbolo não-terminal mais à esquerda de alfa: " + customTree.getLeftMostNonTerminal());
-            System.out.println("Token da entrada que causou o erro: " + e.currentToken.image + "\n");
+            System.out.println("Token da entrada que causou o erro: " + e.currentToken.next.image + "\n");
         } catch (TokenMgrError e) {
             // Em caso de erro na análise léxica
             hasLexicalError = true;
@@ -56,9 +56,13 @@ class MyParser {
         }
 
         if (!hasLexicalError) {
-            System.out.println("\n>> Successo! Sem erros léxicos.");
+            System.out.println("\n>> Successo! Sem erros léxicos.\n");
             System.out.println("Lista de tokens:");
-            System.out.println("\n" + customTree.getLeafNodeNamesList());
+            String output = "";
+            for (int i = 0; i < customTree.getLeafNodeNamesList().size(); i++) {
+                output += customTree.getLeafNodeNamesList().get(i) + " ";
+            }
+            System.out.println(output);
 
             System.out.println("\nTabela de símbolos:\n");
             String label = "Símbolo";
