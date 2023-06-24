@@ -44,23 +44,15 @@ class MyParser {
         } catch (ParseException e) {
             // Em caso de erro na análise sintática
             hasSyntaxError = true;
-            if (parser.token == null) {
-                emptyInput = true;
-            } else {
-                System.out.println("\nErro de análise sintática: " + e.getMessage());
-                System.out.println("Falha na linha: " + e.currentToken.beginLine + ", coluna: " + e.currentToken.beginColumn);
-                System.out.println("Forma sentencial alfa: " + customTree.getSententialForm());
-                System.out.println("Símbolo não-terminal mais à esquerda de alfa: " + customTree.getLeftMostNonTerminal());
-                System.out.println("Token da entrada que causou o erro: " + e.currentToken.image + "\n");
-            }
+
+            System.out.println("\nErro de análise sintática: " + e.getMessage());
+            System.out.println("Forma sentencial alfa: " + customTree.getSententialForm());
+            System.out.println("Símbolo não-terminal mais à esquerda de alfa: " + customTree.getLeftMostNonTerminal());
+            System.out.println("Token da entrada que causou o erro: " + e.currentToken.image + "\n");
         } catch (TokenMgrError e) {
             // Em caso de erro na análise léxica
             hasLexicalError = true;
             System.out.println("\nErro de análise léxica: " + e.getMessage());
-        }
-
-        if (emptyInput) {
-            System.out.println("Erro de análise sintática: entrada vazia na tabela de reconhecimento");
         }
 
         if (!hasLexicalError) {
@@ -100,6 +92,7 @@ TOKEN:
 | < IF: "if" >
 | < ELSE: "else" >
 | < FOR: "for" >
+| < CALL: "call" >
 }
 
 /* Operadores */
@@ -151,13 +144,12 @@ void funclist():
 {}
 {
     {customTree.addTokenToList("funclist", false);}
-    funcdef() funclist2()
+    funcdef() f1()
 }
 
-void funclist2():
+void f1():
 {}
-{
-    {customTree.addTokenToList("funclist2", false);}
+{   {customTree.addTokenToList("f1", false);}
     funclist() | {}
 }
 
@@ -168,17 +160,24 @@ void funcdef():
     defToken() idToken("function") openpToken() paramlist() closepToken() opencbToken() statelist() closecbToken()
 }
 
+void type():
+{}
+{
+    {customTree.addTokenToList("type", false);}
+    intToken() | floatToken() | stringToken()
+}
+
 void paramlist():
 {}
 {
     {customTree.addTokenToList("paramlist", false);}
-    (intToken() | floatToken() | stringToken() ) idToken("parameter") commaToken() paramlist2() | {}
+    type() idToken("parameter") f2() | {}
 }
 
-void paramlist2():
+void f2():
 {}
 {
-    {customTree.addTokenToList("paramlist2", false);}
+    {customTree.addTokenToList("f2", false);}
     commaToken() paramlist() | {}
 }
 
@@ -193,41 +192,49 @@ void vardecl():
 {}
 {
     {customTree.addTokenToList("vardecl", false);}
-    ( intToken() | floatToken() | stringToken()) idToken("variable") ic()
+     type() idToken("variable") p1()
 }
 
-void ic():
+void p1():
 {}
 {
-    {customTree.addTokenToList("ic", false);}
-    openbToken() intConstToken() closebToken() ic() | {}
+    {customTree.addTokenToList("p1", false);}
+    openbToken() intConstToken() closebToken() p1() | {}
 }
 
 void atribstat():
 {}
 {
     {customTree.addTokenToList("atribstat", false);}
-    lvalue() assignToken() (LOOKAHEAD(2) expression() | allocexpression() | funccal())
+    lvalue() assignToken() f3()
 }
+
+void f3():
+{}
+{
+    {customTree.addTokenToList("f3", false);}
+     (expression() | allocexpression() | funccal())
+}
+
 
 void funccal():
 {}
 {
     {customTree.addTokenToList("funccal", false);}
-    idToken("function") openpToken() paramlistcall() closepToken()
+    callToken() idToken("function") openpToken() paramlistcall() closepToken()
 }
 
 void paramlistcall():
 {}
 {
     {customTree.addTokenToList("paramlistcall", false);}
-    idToken("parameter") paramlistcall2() | {}
+    idToken("parameter") f4() | {}
 }
 
-void paramlistcall2():
+void f4():
 {}
 {
-    {customTree.addTokenToList("paramlistcall2", false);}
+    {customTree.addTokenToList("f4", false);}
     commaToken() paramlistcall() | {}
 }
 
@@ -256,13 +263,13 @@ void ifstat():
 {}
 {
     {customTree.addTokenToList("ifstat", false);}
-    ifToken() openpToken() expression() closepToken() statement() es()
+    ifToken() openpToken() expression() closepToken() statement() p2()
 }
 
-void es():
+void p2():
 {}
 {
-    {customTree.addTokenToList("es", false);}
+    {customTree.addTokenToList("p2", false);}
     elseToken() statement() | {}
 }
 
@@ -277,13 +284,13 @@ void statelist():
 {}
 {
     {customTree.addTokenToList("statelist", false);}
-    statement() sl()
+    statement() p3()
 }
 
-void sl():
+void p3():
 {}
 {
-    {customTree.addTokenToList("sl", false);}
+    {customTree.addTokenToList("p3", false);}
     statelist() | {}
 }
 
@@ -291,70 +298,91 @@ void allocexpression():
 {}
 {
     {customTree.addTokenToList("allocexpression", false);}
-    newToken() (intToken() | floatToken() | stringToken()) ne()
+    newToken() type() p4()
 }
 
-void ne():
+void p4():
 {}
 {
-    {customTree.addTokenToList("ne", false);}
-    openbToken() numexpression() closebToken() (ne() | {})
+    {customTree.addTokenToList("p4", false);}
+    openbToken() numexpression() closebToken() p4() | {}
 }
 
 void expression():
 {}
 {
-    {customTree.addTokenToList("numexpression", false);}
-    numexpression() ned()
+    {customTree.addTokenToList("expression", false);}
+    numexpression() p5()
 }
 
-void ned():
+void p5():
 {}
 {
-    {customTree.addTokenToList("ned", false);}
-    (lessToken() | greatToken() | lesseqToken() | greateqToken() | equalsToken() | diffToken() ) numexpression() | {}
+    {customTree.addTokenToList("p5", false);}
+    operator() numexpression() | {}
+}
+
+void operator():
+{}
+{
+    {customTree.addTokenToList("operator", false);}
+    lessToken() | greatToken() | lesseqToken() | greateqToken() | equalsToken() | diffToken()
 }
 
 void numexpression():
 {}
 {
     {customTree.addTokenToList("numexpression", false);}
-    term() ner()
+    term() p6()
 }
 
-void ner():
+void p6():
 {}
 {
-    {customTree.addTokenToList("ner", false);}
-    (plusToken() | minusToken() ) term() ner() | {}
+    {customTree.addTokenToList("p6", false);}
+    s1() term() p6() | {}
+}
+
+void s1():
+{}
+{
+    {customTree.addTokenToList("s1", false);}
+    plusToken() | minusToken()
 }
 
 void term():
 {}
 {
     {customTree.addTokenToList("term", false);}
-    unaryexpr() ue()
+    unaryexpr() p7()
 }
 
-void ue():
+void p7():
 {}
 {
-    {customTree.addTokenToList("ue", false);}
-    (multToken() | divToken() | modToken() ) unaryexpr() ue() | {}
+    {customTree.addTokenToList("p7", false);}
+    s2() unaryexpr() p7() | {}
+}
+
+void s2():
+{}
+{
+    {customTree.addTokenToList("s2", false);}
+    multToken() | divToken() | modToken()
 }
 
 void unaryexpr():
 {}
 {
     {customTree.addTokenToList("unaryexpr", false);}
-    mn() factor()
+    p8() factor()
 }
 
-void mn():
+void p8():
 {}
 {
-    {customTree.addTokenToList("mn", false);}
-    plusToken() | minusToken() | {}
+    {customTree.addTokenToList("p8", false);}
+    s1() | {}
 }
 
 void factor():
@@ -368,16 +396,8 @@ void lvalue():
 {}
 {
     {customTree.addTokenToList("lvalue", false);}
-   idToken("lvalue") net()
+   idToken("lvalue") p4()
 }
-
-void net():
-{}
-{
-    {customTree.addTokenToList("net", false);}
-    openbToken() numexpression() closebToken() net() | {}
-}
-
 
 // A partir daqui há os tokens, que foram colocados em funções para que fosse possível executar código java
 // quando cada um deles é encontrado pelo parser.
@@ -463,6 +483,11 @@ void forToken():
 {Token t;}
 {
     t=<FOR> {customTree.addTokenToList("FOR", true, t.image);}
+}
+void callToken():
+{Token t;}
+{
+    t=<CALL> {customTree.addTokenToList("CALL", true, t.image);}
 }
 void plusToken():
 {Token t;}

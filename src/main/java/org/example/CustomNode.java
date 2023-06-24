@@ -23,7 +23,7 @@ public class CustomNode {
         return name;
     }
 
-    public Boolean getTerminal() {
+    public Boolean isTerminal() {
         return terminal;
     }
 }
