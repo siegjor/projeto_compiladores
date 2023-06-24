@@ -30,6 +30,6 @@ linha 34 do Makefile o **PROGRAM1** pela variável contendo o programa desejado.
 Ao executar o comando ``make build``, irá aparecer dois warnings no terminal. Estes warnings estão
 relacionados a alguns métodos dos arquivos gerados pelo JavaCC estarem depreciados. Eles não interferem
 em nada no funcionamento do programa, e a única maneira de tirá-los seria modificando o arquivo
-gerado pelo JavaCC ao executar o comando ``make build``, o que não funciona direito, pois gera um monte
-de erros import nos arquivos. Por isso, como é um problema da ferramenta, pedimos encarecidamente para
+gerado pelo JavaCC ao executar o comando ``make compile``, o que não funciona direito, pois gera um monte
+de erros de import nos arquivos. Por isso, como é um problema da ferramenta, pedimos encarecidamente para
 que o professor ignore estes warnings, já que não temos o que fazer em relação a eles.
