@@ -1,0 +1,103 @@
+def calculateVelocity(float distance, float time) {
+    print distance / time;
+    return;
+}
+
+def calculateAcceleration(float initialVelocity, float finalVelocity, float time) {
+    print (finalVelocity - initialVelocity) / time;
+    return;
+}
+
+def calculateForce(float mass, float acceleration) {
+    print mass * acceleration;
+    return;
+}
+
+def calculateWork(float force, float distance) {
+    print force * distance;
+    return;
+}
+
+def calculatePower(float work, float time) {
+    print work / time;
+    return;
+}
+
+def calculateDensity(float mass, float volume) {
+    print mass / volume;
+    return;
+}
+
+def calculatePressure(float force, float area) {
+    print force / area;
+    return;
+}
+
+def calculateCelsiusToFahrenheit(float celsius) {
+    print (celsius * 9/5) + 32;
+    return;
+}
+
+def calculateFahrenheitToCelsius(float fahrenheit) {
+    print (fahrenheit - 32) * 5/9;
+    return;
+}
+
+def calculateKineticEnergy(float mass, float velocity) {
+    print (1/2) * mass * velocity * velocity;
+    return;
+}
+
+def calculatePotentialEnergy(float mass, float height, float gravity) {
+    print mass * height * gravity;
+    return;
+}
+
+def calculateFrequency(float period) {
+    print 1 / period;
+    return;
+}
+
+def calculateWavelength(float speed, float frequency) {
+    print speed / frequency;
+    return;
+}
+
+def calculateResistance(float voltage, float current) {
+    print voltage / current;
+    return;
+}
+
+def calculateVoltage(float current, float resistance) {
+    print current * resistance;
+    return;
+}
+
+def calculateCurrent(float voltage, float resistance) {
+    print voltage / resistance;
+    return;
+}
+
+def calculateSeriesResistance(float resistance1, float resistance2, float resistance3) {
+    print resistance1 + resistance2 + resistance3;
+    return;
+}
+
+def calculateParallelResistance(float resistance1, float resistance2, float resistance3) {
+    print 1 / resistance1 + 1 / resistance2 + 1 / resistance3;
+    return;
+}
+
+def main() {
+    float val1;
+    float val2;
+    val1 = 10.8;
+    val2 = 28;
+
+    float velocity;
+    float fahrenheit;
+    velocity = call calculateVelocity(val1, val2);
+    fahrenheit = call calculateCelsiusToFahrenheit(val2);
+
+    return;
+}

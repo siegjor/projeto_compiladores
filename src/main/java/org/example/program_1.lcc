@@ -1,0 +1,126 @@
+def calculateCircleArea(float radius) {
+    float area;
+    area = 3.14 * radius * radius;
+    return;
+}
+
+def calculateCircleCircumference(float radius) {
+    float circumference;
+    circumference = 2 * 3.14 * radius;
+    return;
+}
+
+def calculateRectangleArea(float length, float width) {
+    float area;
+    area = length * width;
+    return;
+}
+
+def calculateRectanglePerimeter(float length, float width) {
+    float perimeter;
+    perimeter = 2 * (length + width);
+    return;
+}
+
+def calculateTriangleArea(float base, float height) {
+    float area;
+    area = (base * height) / 2;
+    return;
+}
+
+def calculateSphereVolume(float radius) {
+    float volume;
+    volume = (4/3) * 3.14 * radius * radius * radius;
+    return;
+}
+
+def calculateCylinderVolume(float radius, float height) {
+    float volume;
+    volume = 3.14 * radius * radius * height;
+    return;
+}
+
+def calculateConeVolume(float radius, float height) {
+    float volume;
+    volume = (1/3) * 3.14 * radius * radius * height;
+    return;
+}
+
+def calculateRectangularPrismVolume(float length, float width, float height) {
+    float volume;
+    volume = length * width * height;
+    return;
+}
+
+def main() {
+    float circleRadius;
+    circleRadius = 5.0;
+
+    float rectangleLength;
+    rectangleLength = 6.0;
+
+    float rectangleWidth;
+    rectangleWidth = 4.0;
+
+    float triangleBase;
+    triangleBase = 3.0;
+
+    float triangleHeight;
+    triangleHeight = 2.0;
+
+    float sphereRadius;
+    sphereRadius = 2.0;
+
+    float cylinderRadius;
+    cylinderRadius = 3.0;
+
+    float cylinderHeight;
+    cylinderHeight = 8.0;
+
+    float coneRadius;
+    coneRadius = 2.0;
+
+    float coneHeight;
+    coneHeight = 6.0;
+
+    float prismLength;
+    prismLength = 5.0;
+
+    float prismWidth;
+    prismWidth = 3.0;
+
+    float prismHeight;
+    prismHeight = 4.0;
+
+    float circleArea;
+    float circleCircumference;
+    float rectangleArea;
+    float rectanglePerimeter;
+    float triangleArea;
+    float sphereVolume;
+    float cylinderVolume;
+    float coneVolume;
+    float prismVolume;
+
+    circleArea = call calculateCircleArea(circleRadius);
+    circleCircumference = call calculateCircleCircumference(circleRadius);
+    rectangleArea = call calculateRectangleArea(rectangleLength, rectangleWidth);
+    rectanglePerimeter = call calculateRectanglePerimeter(rectangleLength, rectangleWidth);
+    triangleArea = call calculateTriangleArea(triangleBase, triangleHeight);
+    sphereVolume = call calculateSphereVolume(sphereRadius);
+    cylinderVolume = call calculateCylinderVolume(cylinderRadius, cylinderHeight);
+    coneVolume = call calculateConeVolume(coneRadius, coneHeight);
+    prismVolume = call calculateRectangularPrismVolume(prismLength, prismWidth, prismHeight);
+
+    print "Circle Area: " + circleArea;
+    print "Circle Circumference: " + circleCircumference;
+    print "Rectangle Area: " + rectangleArea;
+    print "Rectangle Perimeter: " + rectanglePerimeter;
+    print "Triangle Area: " + triangleArea;
+    print "Sphere Volume: " + sphereVolume;
+    print "Cylinder Volume: " + cylinderVolume;
+    print "Cone Volume: " + coneVolume;
+    print "Rectangular Prism Volume: " + prismVolume;
+
+    return;
+}
