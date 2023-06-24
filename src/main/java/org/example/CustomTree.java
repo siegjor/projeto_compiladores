@@ -1,13 +1,16 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class CustomTree {
     private ArrayList<CustomNode> tokenList;
+    private HashMap<String, CustomNode> symbolTable;
 
     public CustomTree() {
         this.tokenList = new ArrayList<>();
+        this.symbolTable = new HashMap<>();
     }
 
     public void addTokenToList(String tokenName, boolean terminal) {
@@ -17,6 +20,17 @@ public class CustomTree {
 
     public void addTokenToList(String tokenName, boolean terminal, String tokenValue) {
         CustomNode node = new CustomNode(tokenName, terminal, tokenValue);
+        tokenList.add(node);
+    }
+
+    public void addTokenToList(String tokenName, boolean terminal, String tokenValue, String type) {
+        CustomNode node = new CustomNode(tokenName, terminal, tokenValue, type);
+        if (symbolTable.containsKey(node.getValue())) {
+            symbolTable.get(node.getValue()).incrementCount();
+            symbolTable.get(node.getValue()).addType(type);
+        } else {
+            symbolTable.put(node.getValue(), node);
+        }
         tokenList.add(node);
     }
 
@@ -61,5 +75,9 @@ public class CustomTree {
 
     public ArrayList<String> getLeafNodeNamesList() {
         return getTerminals().stream().map(CustomNode::getValue).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public HashMap<String, CustomNode> getSymbolTable() {
+        return symbolTable;
     }
 }

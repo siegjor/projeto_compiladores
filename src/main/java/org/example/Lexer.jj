@@ -9,7 +9,7 @@ options {
 }
 
 PARSER_BEGIN(MyParser)
-import org.example.CustomTree;import java.util.ArrayList;import java.util.HashMap;
+import org.example.CustomNode;import org.example.CustomTree;import java.util.ArrayList;import java.util.HashMap;
 import java.util.Map;
 
 class MyParser {
@@ -60,9 +60,18 @@ class MyParser {
             System.out.println("Lista de tokens:");
             System.out.println("\n" + customTree.getLeafNodeNamesList());
 
-            System.out.println("\nTabela de símbolos:");
-            for (ArrayList<String> list : symbolTable.values()) {
-                System.out.println("Símbolo: '" + list.get(0) + "', " + list.get(1) + " ocorrências");
+            System.out.println("\nTabela de símbolos:\n");
+            String label = "Símbolo";
+            for (int i = label.length(); i < 27; i++) {
+                label += " ";
+            }
+            System.out.println(label + "\t\t\t\tOcorrências\t\t\tTipos");
+            for (CustomNode node : customTree.getSymbolTable().values()) {
+                String value = node.getValue();
+                for (int i = value.length(); i < 27; i++) {
+                    value += " ";
+                }
+                System.out.println(value + "\t\t\t\t" + node.getCount() + "\t\t\t\t" + node.getTypes());
             }
         }
 
@@ -395,7 +404,7 @@ void factor():
 void lvalue():
 {}
 {
-    {customTree.addTokenToList("lvalue", false);}
+   {customTree.addTokenToList("lvalue", false);}
    idToken("lvalue") p4()
 }
 
@@ -405,19 +414,7 @@ void lvalue():
 void idToken(String type):
 {Token t;}
 {
-    t=<ID> {
-    customTree.addTokenToList("ID", true, t.image);
-    if (symbolTable.containsKey(t.image)) {
-        Integer symbolCount = Integer.valueOf(symbolTable.get(t.image).get(1));
-        symbolCount++;
-        symbolTable.get(t.image).set(1, symbolCount.toString());
-    } else {
-        ArrayList<String> data = new ArrayList<String>();
-        data.add(t.image);
-        data.add("1");
-        symbolTable.put(t.image, data);
-    }
-}
+    t=<ID> {customTree.addTokenToList("ID", true, t.image, type);}
 }
 void intToken():
 {Token t;}
