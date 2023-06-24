@@ -14,7 +14,7 @@ EXAMPLE := ex.lcc
 # Diretório para armazenar os arquivos compilados (.class)
 CLASSES_DIR := classes
 
-# Lista de arquivos .java a serem excluídos durante a limpeza (exceto CustomNode.java)
+# Lista de arquivos .java a serem excluídos durante a limpeza (exceto CustomNode.java e CustomTree.java)
 JAVA_FILES := $(filter-out CustomNode.java CustomTree.java,$(wildcard *.java))
 
 # Builda o target
