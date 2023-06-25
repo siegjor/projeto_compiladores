@@ -7,6 +7,7 @@
     <list default="true" id="83f0d6dd-3f97-4873-ab20-cf04070d7727" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

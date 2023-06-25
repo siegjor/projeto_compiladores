@@ -27,10 +27,15 @@ compile:
 build:
 	$(JAVAC) -d $(CLASSES_DIR) *.$(JAVA)
 
-# Roda o programa
-# Para ler outras entradas, mude PROGRAM1 para PROGRAM2 ou PROGRAM3
-run:
+# Roda o programa (run1 roda program_1.lcc, run2 roda o program_2.lcc e run3 roda o program_3.lcc)
+run1:
 	$(JAVA) -cp $(CLASSES_DIR) MyParser < $(PROGRAM1)
+
+run2:
+	$(JAVA) -cp $(CLASSES_DIR) MyParser < $(PROGRAM2)
+
+run3:
+	$(JAVA) -cp $(CLASSES_DIR) MyParser < $(PROGRAM3)
 
 # Deleta os arquivos gerados
 clean:
@@ -41,6 +46,3 @@ else
 	rm -rf $(CLASSES_DIR)
 	rm -f $(JAVA_FILES)
 endif
-
-# Phony targets
-.PHONY: all compile build run clean
